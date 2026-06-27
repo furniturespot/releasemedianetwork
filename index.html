@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Release Media Network | Every Story Matters</title>
+    <meta name="description" content="Award-winning global news, business, technology, sports, and political updates.">
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800;900&family=Plus+Jakarta+Sans:wght@500;700;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons (For Premium Vector/Cartoon Illustrations) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & CORE THEME
+           ========================================================================== */
+        :root {
+            /* Core Palette */
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --text-primary: #111111;
+            --text-secondary: #555555;
+            --accent-red: #E10600;
+            --light-red: #FFEBEE;
+            --border-color: #EEEEEE;
+            
+            /* Glass & Shadows */
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-blur: blur(20px);
+            --glass-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+            --glow-shadow: 0 0 20px rgba(225, 6, 0, 0.4);
+            
+            /* Category Colors - Comprehensive */
+            --cat-release: #FFC107;
+            --cat-business: #003A70;
+            --cat-auto: #D4A017;
+            --cat-style: #800020;
+            --cat-tech: #3FA9F5;
+            --cat-sports: #D50000;
+            --cat-politics: #7B2CBF;
+            --cat-health: #2ECC71;
+            --cat-entertainment: #FF1493;
+            --cat-travel: #FF8C00;
+            --cat-world: #000080;
+            --cat-finance: #4169E1;
+            --cat-education: #4B0082;
+
+            /* Typography */
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-accent: 'Plus Jakarta Sans', sans-serif;
+            --font-pop: 'Poppins', sans-serif;
+
+            /* Easing */
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark Mode */
+        body.dark-theme {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --border-color: #222222;
+            --glass-bg: rgba(15, 15, 15, 0.75);
+            --glass-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            --glow-shadow: 0 0 30px rgba(225, 6, 0, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-body); background-color: var(--bg-primary);
+            color: var(--text-primary); overflow-x: hidden; cursor: none;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; height: auto; display: block; }
+        button, input { font-family: var(--font-accent); cursor: none; outline: none;}
+
+        /* Canvas Background for Particle Effects */
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: 0.5; }
+        body.dark-theme #particle-canvas { opacity: 0.2; }
+
+        /* ==========================================================================
+           2. CUSTOM CURSOR & PROGRESS
+           ========================================================================== */
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 9999999; pointer-events: none;
+        }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-red); transition: width 0.2s, height 0.2s, background-color 0.2s; }
+        .cursor-outline { width: 45px; height: 45px; border: 2px solid rgba(225, 6, 0, 0.4); transition: width 0.15s, height 0.15s, border-color 0.15s; }
+        
+        body.hovering .cursor-dot { width: 60px; height: 60px; background-color: rgba(225, 6, 0, 0.15); mix-blend-mode: multiply; backdrop-filter: blur(2px); }
+        body.dark-theme.hovering .cursor-dot { mix-blend-mode: screen; background-color: rgba(225, 6, 0, 0.3); }
+        body.hovering .cursor-outline { width: 80px; height: 80px; border-color: var(--accent-red); border-width: 1px; }
+
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--accent-red), var(--cat-release)); width: 0%; z-index: 100000; box-shadow: var(--glow-shadow); }
+
+        /* ==========================================================================
+           3. ADVANCED PRELOADER
+           ========================================================================== */
+        #preloader {
+            position: fixed; inset: 0; background: var(--bg-primary); z-index: 999990;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s var(--ease-out-expo), visibility 0.8s; overflow: hidden;
+        }
+        .pl-globe { font-size: 8rem; color: var(--cat-release); animation: spinGlobe 4s linear infinite; margin-bottom: 20px;}
+        .pl-title { font-size: 4rem; font-weight: 900; background: linear-gradient(45deg, var(--accent-red), #ff5555); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; animation: pulse 2s infinite;}
+        .pl-bar-wrap { width: 400px; height: 6px; background: var(--border-color); border-radius: 6px; overflow: hidden; position: relative; margin-top:20px;}
+        .pl-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent-red); width: 0%; box-shadow: 0 0 10px var(--accent-red); animation: fillBar 2.5s var(--ease-out-expo) forwards; }
+        .pl-flying-news { position: absolute; font-size: 2rem; color: var(--text-secondary); opacity: 0.2; animation: flyNews 3s linear infinite; }
+
+        /* ==========================================================================
+           4. NAVIGATION (Mega Menu & Live Bar)
+           ========================================================================== */
+        .live-bar {
+            background: linear-gradient(90deg, var(--accent-red), #990000); color: white;
+            padding: 8px 20px; display: flex; align-items: center; font-family: var(--font-accent); font-size: 0.85rem; overflow: hidden;
+        }
+        .live-badge {
+            background: white; color: var(--accent-red); padding: 4px 15px; border-radius: 20px;
+            display: flex; align-items: center; gap: 8px; z-index: 2; font-weight: 800; box-shadow: 0 2px 10px rgba(0,0,0,0.3); margin-right: 20px;
+        }
+        .live-pulse { width: 10px; height: 10px; background: var(--accent-red); border-radius: 50%; animation: pulse 1s infinite; }
+        .ticker-wrap { flex-grow: 1; overflow: hidden; }
+        .ticker { display: flex; white-space: nowrap; gap: 50px; animation: tickerScroll 40s linear infinite; }
+        .ticker:hover { animation-play-state: paused; }
+        .ticker-item { cursor: none; font-weight: 600; transition: color 0.3s; }
+        .ticker-item:hover { color: var(--cat-release); text-decoration: underline; }
+
+        header { position: sticky; top: 0; z-index: 9999; background: var(--bg-primary); transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s; }
+        header.scrolled {
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: var(--glass-shadow); border-bottom: 1px solid rgba(150,150,150,0.1);
+        }
+        
+        /* Top Header Action Bar */
+        .nav-main { max-width: 1600px; margin: 0 auto; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 2.5rem; font-weight: 900; display: flex; align-items: center; gap: 12px; letter-spacing: -1px; }
+        .logo i { color: var(--cat-release); font-size: 2.8rem; animation: floatSmall 3s infinite; }
+        .logo span { color: var(--accent-red); }
+        
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .icon-btn {
+            background: var(--bg-secondary); border: 1px solid var(--border-color); width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--text-primary);
+            transition: all 0.3s var(--ease-spring); position: relative; overflow: hidden;
+        }
+        .icon-btn:hover { background: var(--accent-red); color: white; transform: scale(1.1) rotate(5deg); border-color: transparent; box-shadow: var(--glow-shadow); }
+        .lang-sel { font-family: var(--font-accent); font-weight: 700; background: transparent; border: none; color: var(--text-primary); cursor: none; padding: 0 10px;}
+
+        /* Premium Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-red), #ff2a2a); color: white; border: none;
+            padding: 14px 35px; border-radius: 30px; font-weight: 700; font-size: 1rem;
+            box-shadow: 0 10px 20px rgba(225, 6, 0, 0.3); position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 10px; transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-primary::before {
+            content:''; position:absolute; top:0; left:-100%; width:50%; height:100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px rgba(225, 6, 0, 0.5); }
+        .btn-primary:hover::before { left: 150%; }
+        .magnetic-wrap { display: inline-block; padding: 10px; }
+
+        /* Secondary Category Bar (Scrollable) */
+        .nav-cats-wrap { border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .nav-cats {
+            max-width: 1600px; margin: 0 auto; display: flex; gap: 30px; padding: 15px 40px;
+            overflow-x: auto; scrollbar-width: none; font-family: var(--font-pop); font-weight: 600; font-size: 0.95rem;
+        }
+        .nav-cats::-webkit-scrollbar { display: none; }
+        .cat-link {
+            position: relative; color: var(--text-secondary); white-space: nowrap; transition: color 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cat-link i { font-size: 1.2rem; transition: transform 0.3s; }
+        .cat-link::after {
+            content: ''; position: absolute; bottom: -16px; left: 0; width: 0; height: 3px;
+            background: var(--hover-color); transition: width 0.3s var(--ease-spring);
+        }
+        .cat-link:hover { color: var(--hover-color); }
+        .cat-link:hover i { transform: translateY(-3px) scale(1.2); }
+        .cat-link:hover::after { width: 100%; }
+
+        /* ==========================================================================
+           5. HERO SLIDER (Cinematic & Interactive)
+           ========================================================================== */
+        .hero-slider {
+            position: relative; height: 85vh; min-height: 650px; margin: 20px 40px;
+            border-radius: 30px; overflow: hidden; box-shadow: var(--glass-shadow);
+        }
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; display: flex; align-items: flex-end; padding: 80px 60px;}
+        .slide.active { opacity: 1; z-index: 2; }
+        
+        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 10s ease-out; }
+        .slide.active .hero-bg { transform: scale(1); }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); }
+        
+        .hero-content { position: relative; z-index: 3; max-width: 1000px; color: white; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 10px; background: var(--accent-red); color: white;
+            padding: 8px 25px; border-radius: 30px; font-weight: 800; font-size: 1rem; margin-bottom: 25px;
+            box-shadow: var(--glow-shadow); animation: slideUpReveal 1s var(--ease-out-expo) forwards; opacity: 0;
+        }
+        .hero-title {
+            font-size: clamp(3rem, 6vw, 6rem); line-height: 1.05; font-weight: 900; margin-bottom: 25px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        /* Typing effect class for JS */
+        .type-cursor { display: inline-block; width: 4px; height: 1em; background: var(--accent-red); margin-left: 5px; animation: blink 1s step-end infinite; vertical-align: text-bottom;}
+        
+        .hero-meta { display: flex; gap: 25px; color: #ddd; font-size: 1.1rem; margin-bottom: 40px; font-family: var(--font-accent); font-weight: 600;}
+        .hero-meta span { display: flex; align-items: center; gap: 8px; }
+
+       
+
+        /* Slider Controls */
+        .hero-nav { position: absolute; bottom: 40px; right: 60px; z-index: 10; display: flex; gap: 15px; }
+        .dot { width: 40px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; transition: 0.4s; }
+        .dot.active { background: var(--accent-red); width: 80px; box-shadow: var(--glow-shadow); }
+
+        /* Widget inside Hero */
+        .hero-widget {
+            position: absolute; top: 40px; right: 60px; z-index: 10;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 20px; color: white; display: flex; align-items: center; gap: 20px;
+        }
+
+        /* ==========================================================================
+           6. TRENDING NEWS (Drag/Swipe Carousel)
+           ========================================================================== */
+        .trending-section { margin: 60px 40px; position: relative; }
+        .trending-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-size: 2rem; }
+        .trending-header i { color: var(--accent-red); animation: bounce 2s infinite; }
+        
+        .trending-track {
+            display: flex; gap: 30px; overflow-x: auto; padding-bottom: 20px;
+            scroll-snap-type: x mandatory; scrollbar-width: none; cursor: grab;
+        }
+        .trending-track::-webkit-scrollbar { display: none; }
+        .trending-track:active { cursor: grabbing; }
+        
+        .trend-card {
+            min-width: 400px; background: var(--bg-primary); border-radius: 20px; padding: 25px;
+            border: 1px solid var(--border-color); box-shadow: var(--glass-shadow);
+            scroll-snap-align: start; display: flex; gap: 20px; transition: transform 0.3s, border-color 0.3s;
+        }
+        .trend-card:hover { transform: translateY(-5px); border-color: var(--accent-red); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .tc-num { font-size: 4rem; font-weight: 900; font-family: var(--font-display); color: transparent; -webkit-text-stroke: 2px var(--border-color); line-height: 0.8; transition: 0.3s; }
+        .trend-card:hover .tc-num { -webkit-text-stroke: 0px; color: var(--accent-red); }
+        .tc-content h3 { font-size: 1.2rem; margin-bottom: 10px; line-height: 1.4; }
+        .tc-content p { font-size: 0.9rem; color: var(--text-secondary); }
+
+        /* ==========================================================================
+           7. MAIN LAYOUT (Grid)
+           ========================================================================== */
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 0 40px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; }
+        
+        /* Section Header Styles */
+        .section-head {
+            display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color); padding-bottom: 15px; position: relative;
+        }
+        .section-head::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 120px; height: 5px;
+            background: var(--section-color, var(--accent-red)); border-radius: 5px;
+        }
+        .sh-title { font-size: 2.5rem; display: flex; align-items: center; gap: 15px; font-weight: 800; }
+        .sh-icon { color: var(--section-color, var(--accent-red)); }
+        .sh-view { font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .sh-view:hover { color: var(--section-color, var(--accent-red)); transform: translateX(5px); }
+
+        /* ==========================================================================
+           8. PREMIUM NEWS CARDS (Glassmorphism & Tilt)
+           ========================================================================== */
+        .news-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 35px; margin-bottom: 70px; position: relative;}
+        
+        .news-card {
+            background: var(--bg-primary); border-radius: 24px; border: 1px solid var(--border-color);
+            overflow: hidden; box-shadow: var(--glass-shadow); display: flex; flex-direction: column;
+            position: relative; transform-style: preserve-3d; transition: all 0.4s;
+        }
+        /* Animated Gradient Border on Hover */
+        .news-card::before {
+            content: ''; position: absolute; inset: -2px; background: linear-gradient(45deg, transparent, var(--card-color), transparent);
+            z-index: -1; border-radius: 26px; opacity: 0; transition: 0.4s;
+        }
+        .news-card:hover::before { opacity: 1; animation: spinBorder 3s linear infinite; }
+        .news-card:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.12); transform: translateY(-5px); border-color: transparent;}
+        body.dark-theme .news-card:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+
+        .nc-img-wrap { position: relative; width: 100%; height: 280px; overflow: hidden; }
+        .nc-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-out-expo); }
+        .news-card:hover .nc-img { transform: scale(1.15) rotate(-2deg); }
+        .nc-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); opacity: 0; transition: 0.4s; }
+        .news-card:hover .nc-overlay { opacity: 1; }
+
+        .nc-badge {
+            position: absolute; top: 20px; left: 20px; z-index: 2; background: var(--card-color); color: white;
+            padding: 8px 20px; border-radius: 30px; font-weight: 800; font-size: 0.9rem;
+            backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform: translateZ(40px);
+        }
+        .nc-ribbon { position: absolute; top: 0; right: 20px; width: 30px; height: 50px; background: var(--card-color); z-index: 2; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); transform: translateY(-100%); transition: 0.4s var(--ease-spring); }
+        .news-card:hover .nc-ribbon { transform: translateY(0); }
+
+        .nc-content { padding: 35px; flex-grow: 1; display: flex; flex-direction: column; transform: translateZ(30px); background: var(--bg-primary);}
+        .nc-meta { display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; font-weight: 600;}
+        .nc-meta-left { display: flex; gap: 15px; }
+        .nc-meta i { color: var(--card-color); font-size: 1.1rem; }
+        
+        .nc-title { font-size: 1.6rem; line-height: 1.35; margin-bottom: 15px; transition: color 0.3s; font-weight: 800;}
+        .news-card:hover .nc-title { color: var(--card-color); }
+        .nc-desc { color: var(--text-secondary); line-height: 1.7; margin-bottom: 30px; flex-grow: 1; font-size: 1.05rem;}
+        
+        .nc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 25px; }
+        .nc-author { display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 1rem; }
+        .nc-author img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border-color); }
+        
+        .nc-actions { display: flex; gap: 12px; }
+        .action-btn {
+            background: var(--bg-secondary); border: 1px solid var(--border-color); width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-secondary); transition: all 0.3s var(--ease-spring);
+        }
+        .action-btn:hover { background: var(--card-color); color: white; transform: scale(1.15) translateY(-5px); border-color: transparent; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+        /* Floating Mascots per category */
+        .cat-mascot { position: absolute; z-index: -1; font-size: 18rem; color: var(--section-color); opacity: 0.03; top: 10%; right: -5%; pointer-events: none; animation: floatComplex 10s infinite alternate; }
+
+        /* ==========================================================================
+           9. SIDEBAR WIDGETS
+           ========================================================================== */
+        .sidebar { display: flex; flex-direction: column; gap: 50px; position: sticky; top: 120px; align-self: start; }
+        .widget { background: var(--bg-primary); border-radius: 30px; padding: 35px; border: 1px solid var(--border-color); box-shadow: var(--glass-shadow); position: relative; overflow: hidden;}
+        .widget-title { font-size: 1.5rem; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; font-weight: 800;}
+        
+        /* Advertisement */
+        .ad-widget { background: #000; color: white; text-align: center; padding: 50px 30px; border-radius: 30px; position: relative;}
+        .ad-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
+        .ad-content { position: relative; z-index: 2; }
+        .ad-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 20px; display: inline-block; backdrop-filter: blur(5px);}
+
+        /* Social Follow */
+        .social-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .sg-item { aspect-ratio: 1; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2rem; color: white; transition: 0.3s var(--ease-spring); position: relative; overflow: hidden;}
+        .sg-item::before { content:''; position: absolute; inset:0; background: white; opacity: 0; transition: 0.3s; mix-blend-mode: overlay;}
+        .sg-item:hover::before { opacity: 0.3; }
+        .sg-item:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 25px rgba(0,0,0,0.2); }
+        .sg-fb { background: #1877F2; } .sg-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); } .sg-tw { background: #1DA1F2; } .sg-yt { background: #FF0000; }
+        .sg-in { background: #0A66C2; } .sg-tg { background: #0088cc; } .sg-wa { background: #25D366; } .sg-th { background: #000000; }
+
+        /* ==========================================================================
+           10. VIDEO & PHOTO GALLERY
+           ========================================================================== */
+        /* Video Section */
+        .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 70px; }
+        .video-card { position: relative; border-radius: 24px; overflow: hidden; aspect-ratio: 16/9; box-shadow: var(--glass-shadow); cursor: none;}
+        .vc-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .video-card:hover .vc-img { transform: scale(1.1); filter: blur(3px) brightness(0.7); }
+        .vc-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; color: white;}
+        .vc-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); width: 80px; height: 80px; background: var(--accent-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; opacity: 0; transition: 0.4s var(--ease-spring); box-shadow: var(--glow-shadow); }
+        .video-card:hover .vc-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .vc-duration { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
+
+        /* Masonry Gallery */
+        .masonry-grid { column-count: 3; column-gap: 30px; margin-bottom: 70px; }
+        .masonry-item { break-inside: avoid; margin-bottom: 30px; border-radius: 20px; overflow: hidden; position: relative; box-shadow: var(--glass-shadow); }
+        .mi-img { width: 100%; display: block; transition: 0.5s; }
+        .masonry-item:hover .mi-img { transform: scale(1.1); }
+        .mi-overlay { position: absolute; inset: 0; background: rgba(225,6,0,0.8); opacity: 0; transition: 0.4s; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; backdrop-filter: blur(5px);}
+        .masonry-item:hover .mi-overlay { opacity: 1; }
+
+        /* ==========================================================================
+           11. FULL WIDTH NEWSLETTER
+           ========================================================================== */
+        .newsletter-section { background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border-radius: 40px; margin: 40px; padding: 100px 40px; text-align: center; position: relative; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--glass-shadow); }
+        .nl-illustration { font-size: 10rem; color: var(--cat-tech); margin-bottom: 30px; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));}
+        .newsletter-section h2 { font-size: 4rem; margin-bottom: 20px; font-weight: 900; }
+        .newsletter-section p { font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 50px; max-width: 600px; margin-left: auto; margin-right: auto;}
+        
+        .nl-form { display: flex; max-width: 700px; margin: 0 auto; background: var(--bg-primary); border-radius: 60px; padding: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.08); border: 2px solid var(--border-color); position: relative; z-index: 2; transition: 0.4s; }
+        .nl-form:focus-within { transform: scale(1.03); border-color: var(--accent-red); box-shadow: var(--glow-shadow); }
+        .nl-form input { flex-grow: 1; border: none; background: transparent; padding: 0 30px; font-size: 1.2rem; color: var(--text-primary); }
+        .nl-form button { border-radius: 50px; padding: 20px 50px; font-size: 1.2rem; }
+
+        /* Floating elements */
+        .nl-f { position: absolute; font-size: 4rem; opacity: 0.3; animation: floatParticle 10s infinite alternate; pointer-events: none; }
+
+        /* ==========================================================================
+           12. MEGA FOOTER
+           ========================================================================== */
+        footer { background: linear-gradient(to bottom, #0a192f, #020c1b); color: #fff; padding: 120px 40px 40px; position: relative; overflow: hidden; }
+        .footer-grid { max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 60px; position: relative; z-index: 2; margin-bottom: 80px; }
+        .footer-brand h2 { font-size: 3rem; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+        .footer-brand p { color: #8892b0; line-height: 1.9; font-size: 1.15rem; margin-bottom: 40px; max-width: 450px;}
+        
+        .footer-links h3 { font-size: 1.5rem; margin-bottom: 30px; color: #ccd6f6; font-weight: 800;}
+        .footer-links ul li { margin-bottom: 18px; }
+        .footer-links ul li a { color: #8892b0; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 1.1rem; }
+        .footer-links ul li a::before { content: '→'; opacity: 0; transform: translateX(-10px); transition: 0.3s; color: var(--accent-red); }
+        .footer-links ul li a:hover { color: #fff; transform: translateX(5px); }
+        .footer-links ul li a:hover::before { opacity: 1; transform: translateX(0); }
+
+        .footer-bottom { max-width: 1600px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px; display: flex; justify-content: space-between; align-items: center; color: #8892b0; position: relative; z-index: 2; font-size: 1.1rem;}
+        .footer-blob { position: absolute; background: radial-gradient(circle, rgba(225,6,0,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(60px); pointer-events: none;}
+        
+        /* ==========================================================================
+           13. SEARCH POPUP
+           ========================================================================== */
+        #search-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: 0.4s; }
+        #search-overlay.active { display: flex; opacity: 1; animation: fadeIn 0.4s forwards; }
+        .so-close { position: absolute; top: 40px; right: 60px; font-size: 3rem; color: white; background: none; border: none; transition: 0.3s; }
+        .so-close:hover { color: var(--accent-red); transform: rotate(90deg); }
+        .so-input { width: 80%; max-width: 1000px; font-size: 5rem; background: transparent; border: none; border-bottom: 3px solid rgba(255,255,255,0.2); color: white; padding-bottom: 20px; font-family: var(--font-display); font-weight: 900; transition: 0.4s; }
+        .so-input:focus { border-color: var(--accent-red); }
+        .so-sugg { margin-top: 40px; width: 80%; max-width: 1000px; display: flex; gap: 20px; flex-wrap: wrap; }
+        .so-tag { background: rgba(255,255,255,0.1); color: white; padding: 10px 25px; border-radius: 30px; font-size: 1.1rem; transition: 0.3s; }
+        .so-tag:hover { background: var(--accent-red); transform: translateY(-5px); }
+
+        /* ==========================================================================
+           14. GLOBAL ANIMATIONS
+           ========================================================================== */
+        .reveal { opacity: 0; transform: translateY(80px); transition: opacity 1s var(--ease-out-expo), transform 1s var(--ease-out-expo); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        @keyframes fillBar { to { width: 100%; } }
+        @keyframes spinGlobe { to { transform: rotate(360deg); } }
+        @keyframes flyNews { 0% { transform: translate(-200px, 200px) rotate(-20deg) scale(0.5); opacity: 0; } 50% { opacity: 0.3; } 100% { transform: translate(500px, -500px) rotate(20deg) scale(1.5); opacity: 0; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+        @keyframes floatSmall { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(10deg); } }
+        @keyframes floatComplex { 0%, 100% { transform: translateY(0) rotate(0deg) scale(1); } 50% { transform: translateY(-40px) rotate(15deg) scale(1.05); } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes slideUpReveal { 0% { opacity: 0; transform: translateY(50px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
+        @keyframes floatParticle { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(50px, -50px) rotate(90deg); } }
+        @keyframes spinBorder { 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .ripple-wrap { position: relative; overflow: hidden; }
+        .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple-anim 0.8s linear; background-color: rgba(255, 255, 255, 0.4); pointer-events: none;}
+        @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+
+        /* ==========================================================================
+           15. NEWS DETAILS MODAL
+           ========================================================================== */
+        .news-modal {
+            position: fixed; inset: 0; z-index: 99999999;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .news-modal.active { opacity: 1; pointer-events: all; }
+        .nm-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+        }
+        .nm-content {
+            position: relative; z-index: 2; width: 90%; max-width: 800px; max-height: 90vh;
+            background: var(--bg-primary); border-radius: 30px; overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: translateY(50px) scale(0.95); transition: transform 0.4s var(--ease-spring);
+        }
+        .news-modal.active .nm-content { transform: translateY(0) scale(1); }
+        .nm-close {
+            position: absolute; top: 20px; right: 20px; z-index: 10;
+            background: rgba(0,0,0,0.6); color: white; border: none;
+            width: 45px; height: 45px; border-radius: 50%; font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); transition: 0.3s var(--ease-spring);
+        }
+        .nm-close:hover { background: var(--accent-red); transform: rotate(90deg) scale(1.1); }
+        .nm-img-wrap { position: relative; width: 100%; height: 400px; }
+        .nm-img { width: 100%; height: 100%; object-fit: cover; }
+        .nm-overlay-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-primary), transparent 50%); }
+        .nm-badge {
+            position: absolute; top: 25px; left: 25px; z-index: 10;
+            background: var(--accent-red); color: white;
+            padding: 8px 20px; border-radius: 30px; font-weight: 800; font-size: 0.9rem;
+            backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .nm-body { padding: 0 40px 40px; position: relative; margin-top: -30px; z-index: 3;}
+        .nm-meta { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 15px; font-weight: 700; display: flex; gap: 15px;}
+        .nm-meta i { color: var(--accent-red); margin-right: 5px; }
+        .nm-title { font-size: 2.5rem; line-height: 1.2; margin-bottom: 25px; font-weight: 900; }
+        .nm-desc { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.8; }
+        /* Hide Scrollbar for modal */
+        .nm-content::-webkit-scrollbar { display: none; }
+        .nm-content { scrollbar-width: none; }
+
+        .category-full-modal {
+            position: fixed; inset: 0; z-index: 9999990;
+            background: var(--bg-primary);
+            overflow-y: auto; overflow-x: hidden;
+            opacity: 0; pointer-events: none;
+            transform: scale(0.95);
+            transition: opacity 0.4s var(--ease-spring), transform 0.4s var(--ease-spring);
+        }
+        .category-full-modal.active {
+            opacity: 1; pointer-events: all; transform: scale(1);
+        }
+        .cfm-header {
+            position: sticky; top: 0; z-index: 10;
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: var(--glass-shadow); border-bottom: 1px solid rgba(150,150,150,0.1);
+        }
+        .cfm-body { max-width: 1600px; margin: 0 auto; padding: 60px 40px; min-height: 80vh; }
+        .cfm-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 35px; margin-top: 20px;
+        }
+        
+        /* Media Queries */
+        @media (max-width: 1400px) { .main-layout { grid-template-columns: 1fr; } .sidebar { position: relative; top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; } .footer-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 900px) { .news-grid, .video-grid { grid-template-columns: 1fr; } .sidebar { grid-template-columns: 1fr; } .hero-title { font-size: 3.5rem; } .masonry-grid { column-count: 2; } .nav-actions .btn-primary { display: none; } }
+        @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .masonry-grid { column-count: 1; } .newsletter-section { padding: 50px 20px; } .hero { padding: 40px 20px; } .so-input { font-size: 2.5rem; } }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Background for Particle Effects -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:20%; left:10%; animation-delay: 0s;"></i>
+        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:60%; left:30%; animation-delay: 1s; font-size: 4rem;"></i>
+        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:30%; right:20%; animation-delay: 2s; font-size: 3rem;"></i>
+        
+        <i class="ph-duotone ph-globe-hemisphere-east pl-globe"></i>
+        <h1 class="pl-title">Release Media</h1>
+        <div style="font-family: var(--font-accent); letter-spacing: 4px; color: var(--text-secondary); font-weight: 700;">INITIALIZING THE TRUTH</div>
+        <div class="pl-bar-wrap"><div class="pl-bar"></div></div>
+    </div>
+
+    <!-- Search Popup -->
+    <div id="search-overlay">
+        <button class="so-close interactable"><i class="ph ph-x"></i></button>
+        <input type="text" class="so-input interactable" placeholder="Search global stories..." id="searchInput">
+        <div class="so-sugg">
+            <div class="so-tag interactable">Artificial Intelligence</div>
+            <div class="so-tag interactable">Mars Colony</div>
+            <div class="so-tag interactable">Global Markets</div>
+            <div class="so-tag interactable">Tech Reviews</div>
+            <div class="so-tag interactable">Election 2026</div>
+        </div>
+    </div>
+
+    <!-- Live News Top Bar -->
+    <div class="live-bar">
+        <div class="live-badge"><div class="live-pulse"></div> BREAKING</div>
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <div class="ticker-item interactable">Apple Announces Revolutionary Mixed Reality Ecosystem Upgrade</div>
+                <div class="ticker-item interactable">•</div>
+                <div class="ticker-item interactable">Federal Reserve Implements AI-Driven Policy Modeling</div>
+                <div class="ticker-item interactable">•</div>
+                <div class="ticker-item interactable">Champions League Final Breaks Global Streaming Records</div>
+                <div class="ticker-item interactable">•</div>
+                <div class="ticker-item interactable">Breakthrough in Solid-State Batteries Promises 1000-Mile EV Range</div>
+                <!-- Duplicate for infinite scroll -->
+                <div class="ticker-item interactable">•</div>
+                <div class="ticker-item interactable">Apple Announces Revolutionary Mixed Reality Ecosystem Upgrade</div>
+                <div class="ticker-item interactable">•</div>
+                <div class="ticker-item interactable">Federal Reserve Implements AI-Driven Policy Modeling</div>
+                <div class="ticker-item interactable">•</div>
+                <div class="ticker-item interactable">Champions League Final Breaks Global Streaming Records</div>
+            </div>
+        </div>
+        <div style="padding-left: 20px; font-weight: 800; border-left: 1px solid rgba(255,255,255,0.3);" id="live-clock">--:--:--</div>
+    </div>
+
+    <!-- Main Header -->
+    <header id="main-header">
+        <div class="nav-main">
+            <a href="#" class="logo interactable">
+                <i class="ph-fill ph-meteor"></i>
+                <div>Release <span>Media</span></div>
+            </a>
+            
+            <div class="nav-actions">
+                <button class="lang-sel interactable">EN <i class="ph-bold ph-caret-down"></i></button>
+                <button class="icon-btn interactable search-trigger" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
+                <button class="icon-btn interactable" aria-label="Notifications"><i class="ph ph-bell-ringing"></i></button>
+                <button class="icon-btn interactable" id="theme-toggle" aria-label="Dark Mode"><i class="ph ph-moon"></i></button>
+               
+                <div class="magnetic-wrap interactable"><button class="btn-primary ripple-wrap" style="background: linear-gradient(135deg, #111, #333);">Subscribe <i class="ph-bold ph-arrow-right"></i></button></div>
+            </div>
+        </div>
+
+        <!-- Scrollable Category Sub-Nav -->
+        <div class="nav-cats-wrap">
+            <nav class="nav-cats">
+                
+                <a href="#" class="cat-link interactable" style="--hover-color: var(--text-primary); color: var(--text-primary);"><i class="ph-fill ph-house"></i> Home</a>
+                <a href="#business" class="cat-link interactable" style="--hover-color: var(--cat-business);"><i class="ph-duotone ph-briefcase"></i> Business</a>
+                <a href="#tech" class="cat-link interactable" style="--hover-color: var(--cat-tech);"><i class="ph-duotone ph-cpu"></i> Technology</a>
+                <a href="#sports" class="cat-link interactable" style="--hover-color: var(--cat-sports);"><i class="ph-duotone ph-person-simple-run"></i> Sports</a>
+                <a href="#politics" class="cat-link interactable" style="--hover-color: var(--cat-politics);"><i class="ph-duotone ph-bank"></i> Politics</a>
+                <a href="#style" class="cat-link interactable" style="--hover-color: var(--cat-style);"><i class="ph-duotone ph-sparkle"></i> Style</a>
+                <a href="#auto" class="cat-link interactable" style="--hover-color: var(--cat-auto);"><i class="ph-duotone ph-car-profile"></i> Auto</a>
+
+            </nav>
+        </div>
+    </header>
+
+    <!-- Cinematic Hero Slider Section -->
+    <section class="hero-slider interactable" id="hero-slider">
+        <!-- Slide 1 -->
+        <div class="slide active">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop" class="hero-bg" alt="Space Tech">
+            <div class="hero-overlay"></div>
+            
+            <i class="ph-duotone ph-rocket mascot mascot-drone" style="color: var(--cat-tech);"></i>
+            <i class="ph-duotone ph-robot mascot mascot-reporter" style="color: var(--bg-primary); left: 5%; right: auto;"></i>
+
+            <div class="hero-content">
+                <div class="hero-badge"><i class="ph-fill ph-fire"></i> Tech Release Exclusive</div>
+                <h1 class="hero-title">The Dawn of <span id="type-text"></span><span class="type-cursor"></span></h1>
+                <div class="hero-meta">
+                    <span><i class="ph-fill ph-clock"></i> 5 Min Read</span>
+                    <span><i class="ph-fill ph-user-circle"></i> Dr. Alan Cole</span>
+                    <span><i class="ph-fill ph-chat-circle"></i> 1,204 Comments</span>
+                </div>
+                <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: white; color: var(--accent-red); font-size: 1.1rem; padding: 18px 45px;">Read Full Story</button></div>
+            </div>
+        </div>
+
+        <!-- Weather Widget floating in Hero -->
+        <div class="hero-widget reveal tilt-element">
+            <i class="ph-duotone ph-cloud-rain" style="font-size: 3rem; color: #4facfe; animation: float 3s infinite;"></i>
+            <div>
+                <div style="font-size: 1.5rem; font-weight: 800;">32°C</div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">Kolkata, IN • Rain</div>
+            </div>
+        </div>
+
+        <div class="hero-nav">
+            <div class="dot active interactable"></div>
+            <div class="dot interactable"></div>
+            <div class="dot interactable"></div>
+        </div>
+    </section>
+
+    <!-- Trending Carousel Section -->
+    <section class="trending-section reveal">
+        <div class="trending-header"><i class="ph-fill ph-trend-up"></i> Trending Globally</div>
+        <div class="trending-track" id="trending-track">
+            <!-- Cards -->
+            <article class="trend-card interactable tilt-element">
+                <div class="tc-num">01</div>
+                <div class="tc-content">
+                    <div style="color: var(--cat-tech); font-weight: 800; font-size: 0.8rem; margin-bottom: 5px;">TECHNOLOGY</div>
+                    <h3>AI Generates First Full-Length Feature Film Without Human Input</h3>
+                    <p>1.2M Views • 2 hours ago</p>
+                </div>
+            </article>
+            <article class="trend-card interactable tilt-element">
+                <div class="tc-num">02</div>
+                <div class="tc-content">
+                    <div style="color: var(--cat-business); font-weight: 800; font-size: 0.8rem; margin-bottom: 5px;">BUSINESS</div>
+                    <h3>Global Markets React to Unified Digital Currency Proposal</h3>
+                    <p>890K Views • 4 hours ago</p>
+                </div>
+            </article>
+            <article class="trend-card interactable tilt-element">
+                <div class="tc-num">03</div>
+                <div class="tc-content">
+                    <div style="color: var(--cat-health); font-weight: 800; font-size: 0.8rem; margin-bottom: 5px;">HEALTH</div>
+                    <h3>CRISPR Trial Successfully Reverses Aging Markers in Human Cells</h3>
+                    <p>3.4M Views • 6 hours ago</p>
+                </div>
+            </article>
+            <article class="trend-card interactable tilt-element">
+                <div class="tc-num">04</div>
+                <div class="tc-content">
+                    <div style="color: var(--cat-sports); font-weight: 800; font-size: 0.8rem; margin-bottom: 5px;">SPORTS</div>
+                    <h3>Underdog Nation Secures World Cup in Historic Upset</h3>
+                    <p>5.1M Views • 12 hours ago</p>
+                </div>
+            </article>
+            <article class="trend-card interactable tilt-element">
+                <div class="tc-num">05</div>
+                <div class="tc-content">
+                    <div style="color: var(--cat-auto); font-weight: 800; font-size: 0.8rem; margin-bottom: 5px;">AUTO</div>
+                    <h3>Flying Cars Finally Cleared for Urban Airspace Corridors</h3>
+                    <p>2.2M Views • 18 hours ago</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Main Grid Layout -->
+    <div class="main-layout">
+        
+        <!-- Left Column: News Categories -->
+        <main>
+            
+            <!-- BUSINESS SECTION -->
+            <section id="business" style="--section-color: var(--cat-business);">
+                <i class="ph-duotone ph-briefcase cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-briefcase sh-icon"></i> Business Release</h2>
+                    <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                
+                <div class="news-grid">
+                    <!-- Business Card 1 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-business);">
+                        <div class="nc-ribbon"></div>
+                        <div class="nc-img-wrap">
+                            <div class="nc-badge">Economy</div>
+                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Building">
+                            <div class="nc-overlay"></div>
+                        </div>
+                        <div class="nc-content">
+                            <div class="nc-meta">
+                                <div class="nc-meta-left"><span>Jun 26</span> <span><i class="ph-fill ph-clock"></i> 4 Min</span></div>
+                                <span><i class="ph-fill ph-eye"></i> 102K</span>
+                            </div>
+                            <h3 class="nc-title">Commercial Real Estate Sees Resurgence in Post-Hybrid Work Era</h3>
+                            <p class="nc-desc">Corporations are redesigning office spaces to prioritize collaborative ecosystems over individual cubicles.</p>
+                        </div>
+                    </article>
+
+                    <!-- Business Card 2 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-business);">
+                        <div class="nc-img-wrap">
+                            <div class="nc-badge">Startups</div>
+                            <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Startup">
+                            <div class="nc-overlay"></div>
+                        </div>
+                        <div class="nc-content">
+                            <div class="nc-meta">
+                                <div class="nc-meta-left"><span>Jun 25</span> <span><i class="ph-fill ph-clock"></i> 6 Min</span></div>
+                                <span><i class="ph-fill ph-eye"></i> 89K</span>
+                            </div>
+                            <h3 class="nc-title">Silicon Valley's Newest Unicorn Focuses on Sustainable Energy Grid</h3>
+                            <p class="nc-desc">How 'EcoCore' managed to secure $2B in Series C funding in just under a week of pitching.</p>
+                        </div>
+                    </article>
+                    
+                    <!-- Business Card 3 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-business);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Finance</div><img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Stock"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 24</span><span><i class="ph-fill ph-clock"></i> 3 Min</span></div><span><i class="ph-fill ph-eye"></i> 142K</span></div>
+                            <h3 class="nc-title">Global Markets Reach Historic Milestones</h3>
+                            <p class="nc-desc">A deep dive into the recent surge across Asian and European trading floors.</p>
+                        </div>
+                    </article>
+
+                    <!-- Business Card 4 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-business);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Trade</div><img src="https://cdn.zeebiz.com/sites/default/files/2026/04/06/403662-trump-ai-400-1200x675.jpg?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Ship"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 23</span><span><i class="ph-fill ph-clock"></i> 7 Min</span></div><span><i class="ph-fill ph-eye"></i> 76K</span></div>
+                            <h3 class="nc-title">New Trade Agreements Reshape Global Chains</h3>
+                            <p class="nc-desc">Logistics companies adapt as new tariffs and corridors open up globally.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- TECHNOLOGY SECTION -->
+            <section id="tech" style="--section-color: var(--cat-tech);">
+                <i class="ph-duotone ph-cpu cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-cpu sh-icon"></i> Technology Release</h2>
+                    <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                <div class="news-grid">
+                    <!-- Tech Card 1 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-tech);">
+                        <div class="nc-img-wrap"><div class="nc-badge">AI Research</div><img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="AI"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 26</span><span><i class="ph-fill ph-clock"></i> 8 Min</span></div><span><i class="ph-fill ph-eye"></i> 250K</span></div>
+                            <h3 class="nc-title">Neural Networks Successfully Map Human Imagination</h3>
+                            <p class="nc-desc">Groundbreaking research translates thought waves into high-definition video output.</p>
+                             </div>
+                    </article>
+                    <!-- Tech Card 2 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-tech);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Hardware</div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9KfUIggSzUVw2pszsQTGH8hLbn5s6B52tJFXKTplYhC_3sHOjCth1Rsg&s=10?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Chip"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 25</span><span><i class="ph-fill ph-clock"></i> 5 Min</span></div><span><i class="ph-fill ph-eye"></i> 198K</span></div>
+                            <h3 class="nc-title">Next-Gen Processors Break 1-Nanometer Barrier</h3>
+                            <p class="nc-desc">Quantum-inspired architectures bring supercomputing to consumer laptops.</p>
+                               </div>
+                    </article>
+                    <!-- Tech Card 3 & 4 (Space constraints, adding 2 to keep layout but maintain file size reasonableness, prompt asks for 4 per section but it gets repetitive. I'll add 4 for completeness.) -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-tech);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Cybersecurity</div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvrh992ByAp7MLsID8K1TNGVunCMlO7cWLkCiolFtdKRATCSh0wX8lv_c&s=10?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Code"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 24</span><span><i class="ph-fill ph-clock"></i> 6 Min</span></div><span><i class="ph-fill ph-eye"></i> 110K</span></div>
+                            <h3 class="nc-title">Autonomous AI Defense Systems in Corporate Networks</h3>
+                            <p class="nc-desc">How algorithms are preempting zero-day vulnerabilities automatically.</p>
+                             </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-tech);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Space Tech</div><img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Space"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 23</span><span><i class="ph-fill ph-clock"></i> 4 Min</span></div><span><i class="ph-fill ph-eye"></i> 340K</span></div>
+                            <h3 class="nc-title">Constellations Achieve Zero-Latency Global Wi-Fi</h3>
+                            <p class="nc-desc">Remote regions connect to the global economy seamlessly.</p>
+                             </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- SPORTS SECTION -->
+            <section id="sports" style="--section-color: var(--cat-sports);">
+                <i class="ph-duotone ph-person-simple-run cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-person-simple-run sh-icon"></i> Sports Release</h2>
+                    <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                <div class="news-grid">
+                    <!-- Sports Card 1 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-sports);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Football</div><img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Football"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 26</span><span><i class="ph-fill ph-clock"></i> 3 Min</span></div><span><i class="ph-fill ph-eye"></i> 450K</span></div>
+                            <h3 class="nc-title">Historic Transfer Breaks Global Financial Records</h3>
+                            <p class="nc-desc">The unprecedented €400M deal changes the landscape of European football.</p>
+                           </div>
+                    </article>
+                    <!-- Sports Card 2 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-sports);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Tennis</div><img src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Tennis"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 25</span><span><i class="ph-fill ph-clock"></i> 5 Min</span></div><span><i class="ph-fill ph-eye"></i> 320K</span></div>
+                            <h3 class="nc-title">Underdog Captures Grand Slam in 5-Set Thriller</h3>
+                            <p class="nc-desc">A look back at the most grueling match in modern tennis history.</p>
+                            </div>
+                    </article>
+                    <!-- Sports Card 3 & 4 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-sports);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Olympics</div><img src="https://cf-images.assettype.com/newindianexpress%2F2026-06-26%2Fe7dns9zz%2FHLvS8TMbsAA0U0c.jfif?rect=0%2C0%2C4096%2C2304&w=480&auto=format%2Ccompress&fit=max?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Track"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 24</span><span><i class="ph-fill ph-clock"></i> 4 Min</span></div><span><i class="ph-fill ph-eye"></i> 210K</span></div>
+                            <h3 class="nc-title">New AI Wearables Shatter World Track Records</h3>
+                            <p class="nc-desc">Debate sparks over the legality of bio-feedback suits in professional racing.</p>
+                              </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-sports);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Basketball</div><img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Basketball"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 23</span><span><i class="ph-fill ph-clock"></i> 6 Min</span></div><span><i class="ph-fill ph-eye"></i> 580K</span></div>
+                            <h3 class="nc-title">Finals MVP Secures Dynasty with Buzzer Beater</h3>
+                            <p class="nc-desc">An incredible climax to the most watched basketball season of the decade.</p>
+                               </div>
+                    </article>
+                </div>
+            </section>
+
+
+
+
+
+
+
+
+
+
+            <!-- REELS SECTION (Added as requested) -->
+            <section id="reels" style="--section-color: #E1306C;">
+                <i class="ph-duotone ph-instagram-logo cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-instagram-logo sh-icon"></i> Release Reels</h2>
+                    <a href="#" class="sh-view interactable">View All <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                
+                <div class="news-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                    <!-- Reel Card 1 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
+                        <div class="nc-img-wrap" style="height: 100%;">
+                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTI-NEuRFx1LqAySLArjINLy9-86ybFZv1lbBiFhxZJ-D9wKpmRrLM9zI8&s=10?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 1">
+                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
+                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- Reel Card 2 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
+                        <div class="nc-img-wrap" style="height: 100%;">
+                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
+                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 2">
+                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
+                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- Reel Card 3 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
+                        <div class="nc-img-wrap" style="height: 100%;">
+                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
+                            <img src="https://static.independent.co.uk/2026/06/26/15/2280563841..?quality=75&width=640&crop=3%3A2%2Csmart&trim=104%2C0%2C104%2C0&auto=webp?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 3">
+                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
+                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- Reel Card 4 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
+                        <div class="nc-img-wrap" style="height: 100%;">
+                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
+                            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 4">
+                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
+                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- POLITICAL SECTION -->
+            <section id="politics" style="--section-color: var(--cat-politics);">
+                <i class="ph-duotone ph-bank cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-bank sh-icon"></i> Political Release</h2>
+                    <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                <div class="news-grid">
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                        <div class="nc-ribbon"></div>
+                        <div class="nc-img-wrap"><div class="nc-badge">Global Summit</div><img src="https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Summit"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 27</span><span><i class="ph-fill ph-clock"></i> 7 Min</span></div><span><i class="ph-fill ph-eye"></i> 1.2M</span></div>
+                            <h3 class="nc-title">Historic Climate Accord Reached in Geneva</h3>
+                            <p class="nc-desc">Nations universally agree to aggressive carbon reduction targets by 2030 in a landmark diplomatic victory.</p>
+                               </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Elections</div><img src="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Elections"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 26</span><span><i class="ph-fill ph-clock"></i> 5 Min</span></div><span><i class="ph-fill ph-eye"></i> 850K</span></div>
+                            <h3 class="nc-title">AI Polling Predicts Historic Landslide Victory</h3>
+                            <p class="nc-desc">New predictive models outperform traditional surveys, pointing to massive shifts in global voter demographics.</p>
+                         </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Policy</div><img src="https://akm-img-a-in.tosshub.com/indiatoday/images/story/202301/collage-of-3-sixteen_nine.jpg?VersionId=9pJec0QN146ALTlxiiByIima2N9PdvR7?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Policy"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 25</span><span><i class="ph-fill ph-clock"></i> 6 Min</span></div><span><i class="ph-fill ph-eye"></i> 420K</span></div>
+                            <h3 class="nc-title">Universal Basic Income Trials Expand Globally</h3>
+                            <p class="nc-desc">Economic experiments show promising early results for socioeconomic mobility in heavily automated regions.</p>
+                            </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Geopolitics</div><img src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Geopolitics"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 24</span><span><i class="ph-fill ph-clock"></i> 8 Min</span></div><span><i class="ph-fill ph-eye"></i> 910K</span></div>
+                            <h3 class="nc-title">New Treaty Regulates Extraterrestrial Mining Rights</h3>
+                            <p class="nc-desc">International cooperation shapes the framework for the modern space race and off-world resource extraction.</p>
+                          </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- STYLE SECTION -->
+            <section id="style" style="--section-color: var(--cat-style);">
+                <i class="ph-duotone ph-sparkle cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-sparkle sh-icon"></i> Style Release</h2>
+                    <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                <div class="news-grid">
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-style);">
+                        <div class="nc-ribbon"></div>
+                        <div class="nc-img-wrap"><div class="nc-badge">Fashion Week</div><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Fashion"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 27</span><span><i class="ph-fill ph-clock"></i> 4 Min</span></div><span><i class="ph-fill ph-eye"></i> 650K</span></div>
+                            <h3 class="nc-title">Paris Fashion Week Unveils Smart Clothing Lines</h3>
+                            <p class="nc-desc">Haute couture meets biotechnology with garments that dynamically adapt to your body temperature.</p>
+                             </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-style);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Luxury</div><img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Luxury"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 26</span><span><i class="ph-fill ph-clock"></i> 6 Min</span></div><span><i class="ph-fill ph-eye"></i> 320K</span></div>
+                            <h3 class="nc-title">The Massive Return of Vintage Watch Collections</h3>
+                            <p class="nc-desc">Why analog masterpieces are making a massive comeback among young digital entrepreneurs.</p>
+                           </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-style);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Beauty</div><img src="https://img.republicworld.com/all_images/2026/06/men-style-guide-for-weddings-1782463929924-1280x720.webp?w=730&h=411&q=75&format=webp?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Beauty"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 25</span><span><i class="ph-fill ph-clock"></i> 5 Min</span></div><span><i class="ph-fill ph-eye"></i> 410K</span></div>
+                            <h3 class="nc-title">AI-Driven Personalized Skincare Routines Go Mainstream</h3>
+                            <p class="nc-desc">Dermatology meets machine learning to formulate products perfectly tailored to your genetic profile.</p>
+                           </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-style);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Trends</div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq7YuETUq-PQMkgznMqI5kJ9wmEZUwpzeuFr6_m-nmgAEPkz_5fnIFQlID&s=10?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Trends"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 24</span><span><i class="ph-fill ph-clock"></i> 3 Min</span></div><span><i class="ph-fill ph-eye"></i> 290K</span></div>
+                            <h3 class="nc-title">Sustainable Fabrics Dominate the Summer Runway</h3>
+                            <p class="nc-desc">Eco-friendly materials and upcycled luxury garments take center stage in Milan.</p>
+                                </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- AUTOMOBILE SECTION -->
+            <section id="auto" style="--section-color: var(--cat-auto);">
+                <i class="ph-duotone ph-car-profile cat-mascot"></i>
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-car-profile sh-icon"></i> Auto Release</h2>
+                    <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                <div class="news-grid">
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-auto);">
+                        <div class="nc-ribbon"></div>
+                        <div class="nc-img-wrap"><div class="nc-badge">Electric</div><img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="EV"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 27</span><span><i class="ph-fill ph-clock"></i> 6 Min</span></div><span><i class="ph-fill ph-eye"></i> 880K</span></div>
+                            <h3 class="nc-title">Next-Gen EVs Break the 1000-Mile Range Barrier</h3>
+                            <p class="nc-desc">Solid-state battery breakthroughs are officially revolutionizing the daily commute and road trips.</p>
+                          </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-auto);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Autonomy</div><img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Autonomy"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 26</span><span><i class="ph-fill ph-clock"></i> 8 Min</span></div><span><i class="ph-fill ph-eye"></i> 710K</span></div>
+                            <h3 class="nc-title">Level 5 Autonomy Fully Approved in Major Cities</h3>
+                            <p class="nc-desc">Steering wheels are officially optional as robotaxis become the standard in urban transit networks.</p>
+                             </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-auto);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Hypercars</div><img src="https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Hypercar"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 25</span><span><i class="ph-fill ph-clock"></i> 4 Min</span></div><span><i class="ph-fill ph-eye"></i> 550K</span></div>
+                            <h3 class="nc-title">The $5M Hypercar Powered Entirely by Synthetic Fuel</h3>
+                            <p class="nc-desc">Aerospace engineering meets the asphalt in this completely carbon-neutral track monster.</p>
+                            </div>
+                    </article>
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-auto);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Future Mobility</div><img src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Future Auto"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 24</span><span><i class="ph-fill ph-clock"></i> 5 Min</span></div><span><i class="ph-fill ph-eye"></i> 1.1M</span></div>
+                            <h3 class="nc-title">Flying Cars: The Next Step in Urban Transit Reality</h3>
+                            <p class="nc-desc">Sky-corridors are officially opening for personal aerial vehicles in designated tech hubs.</p>
+                          </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- VIDEO SECTION -->
+            <section id="videos" style="--section-color: var(--accent-red);">
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-play-circle sh-icon"></i> Premium Video Coverage</h2>
+                    <a href="#" class="sh-view interactable">All Videos <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+                <div class="video-grid">
+                    <div class="video-card reveal interactable">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop" class="vc-img" alt="Video">
+                        <div class="vc-overlay">
+                            <h4 style="font-size: 1.2rem; font-family: var(--font-display);">Inside the Quantum Lab</h4>
+                        </div>
+                        <div class="vc-play"><i class="ph-fill ph-play"></i></div>
+                        <div class="vc-duration">12:45</div>
+                    </div>
+                    <div class="video-card reveal interactable" style="transition-delay: 0.1s;">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop" class="vc-img" alt="Video">
+                        <div class="vc-overlay">
+                            <h4 style="font-size: 1.2rem; font-family: var(--font-display);">The Future of Cities</h4>
+                        </div>
+                        <div class="vc-play"><i class="ph-fill ph-play"></i></div>
+                        <div class="vc-duration">08:20</div>
+                    </div>
+                    <div class="video-card reveal interactable" style="transition-delay: 0.2s;">
+                        <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=600&auto=format&fit=crop" class="vc-img" alt="Video">
+                        <div class="vc-overlay">
+                            <h4 style="font-size: 1.2rem; font-family: var(--font-display);">World Cup Highlights</h4>
+                        </div>
+                        <div class="vc-play"><i class="ph-fill ph-play"></i></div>
+                        <div class="vc-duration">04:15</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PHOTO GALLERY (Masonry) -->
+            <section id="gallery" style="--section-color: var(--cat-release);">
+                <div class="section-head reveal">
+                    <h2 class="sh-title"><i class="ph-duotone ph-camera sh-icon"></i> Editor's Photo Gallery</h2>
+                </div>
+                <div class="masonry-grid">
+                    <!-- Lightbox functionality attached to interactable class -->
+                    <div class="masonry-item reveal interactable"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500" class="mi-img"><div class="mi-overlay"><i class="ph-bold ph-arrows-out"></i></div></div>
+                    <div class="masonry-item reveal interactable"><img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500" class="mi-img"><div class="mi-overlay"><i class="ph-bold ph-arrows-out"></i></div></div>
+                    <div class="masonry-item reveal interactable"><img src="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=500" class="mi-img"><div class="mi-overlay"><i class="ph-bold ph-arrows-out"></i></div></div>
+                    <div class="masonry-item reveal interactable"><img src="https://assets1.cbsnewsstatic.com/hub/i/r/2025/12/31/3a60ef6a-5a9e-48c0-986b-d6d2719c1f86/thumbnail/640x360/206d0486e4689b44d0d1a31370dec284/10p-pkg-nvent-profile-wcco9hju.jpg?w=500" class="mi-img"><div class="mi-overlay"><i class="ph-bold ph-arrows-out"></i></div></div>
+                    <div class="masonry-item reveal interactable"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvBq8gac9u9WV7SUJ_Viq-Vm4RcRKXPZmV0SZH7ZmYJRfZn-DPUFWslGXu&s=10?w=500" class="mi-img"><div class="mi-overlay"><i class="ph-bold ph-arrows-out"></i></div></div>
+                    <div class="masonry-item reveal interactable"><img src="https://images.unsplash.com/photo-1521747116042-5a810fda9664?w=500" class="mi-img"><div class="mi-overlay"><i class="ph-bold ph-arrows-out"></i></div></div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Right Column: Massive Sidebar -->
+        <aside class="sidebar">
+            
+            <!-- Ad Widget -->
+            <div class="widget ad-widget reveal interactable tilt-element">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" class="ad-bg">
+                <div class="ad-content">
+                    <div class="ad-badge">Sponsored Content</div>
+                    <h3 style="font-size: 1.8rem; margin-bottom: 15px; font-weight: 800; font-family: var(--font-display);">Experience True Luxury</h3>
+                    <p style="margin-bottom: 25px; font-size: 0.95rem;">The all-new electric series from Zenith Motors. Drive the future.</p>
+                    <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: white; color: black;">Discover More</button></div>
+                </div>
+            </div>
+
+            <!-- Popular News (List style) -->
+            <div class="widget reveal">
+                <h3 class="widget-title"><i class="ph-fill ph-star" style="color: var(--cat-release);"></i> Popular Today</h3>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 20px;">
+                    <li class="interactable" style="display: flex; gap: 15px; align-items: center;">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100" style="width: 80px; height: 80px; border-radius: 15px; object-fit: cover;">
+                        <div>
+                            <h4 style="font-size: 1rem; line-height: 1.3; transition: 0.3s;" onmouseover="this.style.color='var(--accent-red)'" onmouseout="this.style.color=''">Real Estate Resurgence</h4>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;"><i class="ph-fill ph-clock"></i> 2 hours ago</div>
+                        </div>
+                    </li>
+                    <li class="interactable" style="display: flex; gap: 15px; align-items: center;">
+                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100" style="width: 80px; height: 80px; border-radius: 15px; object-fit: cover;">
+                        <div>
+                            <h4 style="font-size: 1rem; line-height: 1.3; transition: 0.3s;" onmouseover="this.style.color='var(--cat-tech)'" onmouseout="this.style.color=''">AI Maps Imagination</h4>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;"><i class="ph-fill ph-clock"></i> 5 hours ago</div>
+                        </div>
+                    </li>
+                    <li class="interactable" style="display: flex; gap: 15px; align-items: center;">
+                        <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100" style="width: 80px; height: 80px; border-radius: 15px; object-fit: cover;">
+                        <div>
+                            <h4 style="font-size: 1rem; line-height: 1.3; transition: 0.3s;" onmouseover="this.style.color='var(--cat-sports)'" onmouseout="this.style.color=''">Historic Football Transfer</h4>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;"><i class="ph-fill ph-clock"></i> 8 hours ago</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Social Follow Grid -->
+            <div class="widget reveal">
+                <h3 class="widget-title"><i class="ph-fill ph-share-network" style="color: var(--cat-finance);"></i> Connect With Us</h3>
+                <div class="social-grid">
+                    <a href="#" class="sg-item sg-fb interactable"><i class="ph-fill ph-facebook-logo"></i></a>
+                    <a href="#" class="sg-item sg-ig interactable"><i class="ph-fill ph-instagram-logo"></i></a>
+                    <a href="#" class="sg-item sg-tw interactable"><i class="ph-fill ph-twitter-logo"></i></a>
+                    <a href="#" class="sg-item sg-yt interactable"><i class="ph-fill ph-youtube-logo"></i></a>
+                    <a href="#" class="sg-item sg-in interactable"><i class="ph-fill ph-linkedin-logo"></i></a>
+                    <a href="#" class="sg-item sg-tg interactable"><i class="ph-fill ph-telegram-logo"></i></a>
+                    <a href="#" class="sg-item sg-wa interactable"><i class="ph-fill ph-whatsapp-logo"></i></a>
+                    <a href="#" class="sg-item sg-th interactable"><i class="ph-fill ph-threads-logo"></i></a>
+                </div>
+            </div>
+
+        </aside>
+    </div>
+
+    <!-- Full Width Newsletter Section -->
+    <section class="newsletter-section reveal">
+        <i class="ph-duotone ph-sparkle nl-f" style="top: 20%; left: 15%; color: var(--cat-release);"></i>
+        <i class="ph-duotone ph-paper-plane-tilt nl-f" style="bottom: 20%; right: 15%; color: var(--accent-red); animation-delay: 2s;"></i>
+        <i class="ph-duotone ph-envelope-simple-open nl-f" style="top: 10%; right: 25%; color: var(--cat-tech); animation-delay: 1s;"></i>
+        
+        <i class="ph-duotone ph-newspaper nl-illustration"></i>
+        <h2>Don't Miss a Single Headline.</h2>
+        <p>Join over 5 million readers who trust Release Media Network for their daily insights, curated explicitly for your interests.</p>
+        
+        <form class="nl-form interactable" id="nl-form">
+            <input type="email" placeholder="Enter your premium email address..." required>
+            <button type="submit" class="btn-primary ripple-wrap">Subscribe <i class="ph-bold ph-paper-plane-right"></i></button>
+        </form>
+    </section>
+
+    <!-- Mega Footer -->
+    <footer>
+        <div class="footer-blob" style="width: 800px; height: 800px; top: -400px; right: -200px; animation: pulse 8s infinite alternate;"></div>
+        <div class="footer-grid">
+            <div class="footer-brand reveal" style="grid-column: span 2;">
+                <h2><i class="ph-fill ph-meteor" style="color: var(--cat-release);"></i> Release Media</h2>
+                <p>"Every Story Matters." We deliver premium, globally recognized journalism engineered with award-winning design and uncompromised integrity. Founded in the pursuit of absolute truth.</p>
+            </div>
+            
+            <div class="footer-links reveal" style="transition-delay: 0.1s;">
+                <h3>News Desk</h3>
+                <ul>
+                    <li><a href="#" class="interactable">Business Release</a></li>
+                    <li><a href="#" class="interactable">Technology Release</a></li>
+                    <li><a href="#" class="interactable">Political Release</a></li>
+                    <li><a href="#" class="interactable">Sports Release</a></li>
+                    <li><a href="#" class="interactable">World Release</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links reveal" style="transition-delay: 0.2s;">
+                <h3>Organization</h3>
+                <ul>
+                    <li><a href="#" class="interactable">About Us</a></li>
+                    <li><a href="#" class="interactable">Careers</a></li>
+                    <li><a href="#" class="interactable">Editorial Standards</a></li>
+                    <li><a href="#" class="interactable">Press Room</a></li>
+                    <li><a href="#" class="interactable">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links reveal" style="transition-delay: 0.3s;">
+                <h3>Legal & Privacy</h3>
+                <ul>
+                    <li><a href="#" class="interactable">Terms of Service</a></li>
+                    <li><a href="#" class="interactable">Privacy Policy</a></li>
+                    <li><a href="#" class="interactable">Cookie Settings</a></li>
+                    <li><a href="#" class="interactable">Accessibility Statement</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div>&copy; 2026 Release Media Network. All rights reserved. Designed with precision.</div>
+            <button id="back-to-top" class="icon-btn interactable" style="background: rgba(255,255,255,0.1); color:white; border-color: rgba(255,255,255,0.2);">
+                <i class="ph-bold ph-caret-up"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Full Screen Category Modal -->
+    <div id="category-full-modal" class="category-full-modal">
+        <header id="cfm-header" class="cfm-header"></header>
+        
+        <div class="cfm-body">
+            <button id="cfm-close" class="btn-primary ripple-wrap interactable" style="margin-bottom: 40px; padding: 12px 25px; font-size: 0.95rem;">
+                <i class="ph-bold ph-arrow-left"></i> Back to Feed
+            </button>
+            <div class="section-head">
+                <h2 class="sh-title" id="cfm-title">Category</h2>
+            </div>
+            <div class="cfm-grid" id="cfm-grid"></div>
+        </div>
+        
+        <footer id="cfm-footer"></footer>
+    </div>
+
+    <!-- News Details Modal -->
+    <div id="news-modal" class="news-modal">
+        <div class="nm-overlay interactable" id="nm-close-overlay"></div>
+        <div class="nm-content">
+            <button class="nm-close interactable" id="nm-close-btn"><i class="ph-bold ph-x"></i></button>
+            <div class="nm-img-wrap">
+                <div class="nm-badge" id="nm-badge">Category</div>
+                <img src="" alt="News Image" class="nm-img" id="nm-img">
+                <div class="nm-overlay-gradient"></div>
+            </div>
+            <div class="nm-body">
+                <div class="nm-meta" id="nm-meta"></div>
+                <h2 class="nm-title" id="nm-title">Headline</h2>
+                <p class="nm-desc" id="nm-desc" style="font-weight: 700; font-size: 1.25rem; color: var(--text-primary); margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 25px;">Description goes here.</p>
+                <div class="nm-article" id="nm-article" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary);">
+                    <!-- 500 word article will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vanilla JavaScript Architecture -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* ==========================================================================
+               1. ADVANCED PRELOADER
+               ========================================================================== */
+            const preloader = document.getElementById('preloader');
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 800);
+                }, 2500); // Cinematic delay
+            });
+
+            /* ==========================================================================
+               2. CUSTOM CURSOR
+               ========================================================================== */
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+            const interactables = document.querySelectorAll('.interactable, a, button, input');
+
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX; const posY = e.clientY;
+                cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`;
+                cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 150, fill: 'forwards' });
+            });
+
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+
+            /* ==========================================================================
+               3. SCROLL PROGRESS & STICKY HEADER
+               ========================================================================== */
+            const header = document.getElementById('main-header');
+            const progressBar = document.getElementById('scroll-progress');
+            
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('scrolled', window.scrollY > 50);
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                progressBar.style.width = (winScroll / height) * 100 + "%";
+            });
+
+            /* ==========================================================================
+               4. DARK MODE TOGGLE & LIVE CLOCK
+               ========================================================================== */
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-theme');
+                const icon = themeToggle.querySelector('i');
+                icon.className = document.body.classList.contains('dark-theme') ? 'ph ph-sun' : 'ph ph-moon';
+            });
+
+            const clockEl = document.getElementById('live-clock');
+            setInterval(() => {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
+            }, 1000);
+
+            /* ==========================================================================
+               5. SEARCH POPUP
+               ========================================================================== */
+            const searchTrigger = document.querySelector('.search-trigger');
+            const searchOverlay = document.getElementById('search-overlay');
+            const searchClose = document.querySelector('.so-close');
+            const searchInput = document.getElementById('searchInput');
+
+            searchTrigger.addEventListener('click', () => {
+                searchOverlay.classList.add('active');
+                setTimeout(() => searchInput.focus(), 400);
+            });
+            searchClose.addEventListener('click', () => searchOverlay.classList.remove('active'));
+
+            /* ==========================================================================
+               6. HERO SLIDER & TYPING ANIMATION
+               ========================================================================== */
+            const typeText = document.getElementById('type-text');
+            const words = ["Quantum Global Networks", "Sustainable AI Grids", "Next-Gen Biotechnology"];
+            let wordIndex = 0; let charIndex = 0; let isDeleting = false;
+
+            function typeEffect() {
+                const currentWord = words[wordIndex];
+                if (isDeleting) {
+                    typeText.textContent = currentWord.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    typeText.textContent = currentWord.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+
+                let speed = isDeleting ? 50 : 100;
+                
+                if (!isDeleting && charIndex === currentWord.length) {
+                    speed = 2000; // Pause at end
+                    isDeleting = true;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                    speed = 500; // Pause before new word
+                }
+                setTimeout(typeEffect, speed);
+            }
+            setTimeout(typeEffect, 3000); // Start after preloader
+
+            /* ==========================================================================
+               7. DRAG TO SCROLL (TRENDING CAROUSEL)
+               ========================================================================== */
+            const slider = document.getElementById('trending-track');
+            let isDown = false; let startX; let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.style.scrollSnapType = 'none'; // Disable snap while dragging
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', () => { isDown = false; slider.style.scrollSnapType = 'x mandatory'; });
+            slider.addEventListener('mouseup', () => { isDown = false; slider.style.scrollSnapType = 'x mandatory'; });
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2; // Scroll speed
+                slider.scrollLeft = scrollLeft - walk;
+            });
+
+            /* ==========================================================================
+               8. SCROLL REVEAL (INTERSECTION OBSERVER)
+               ========================================================================== */
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(el => observer.observe(el));
+
+            /* ==========================================================================
+               9. PREMIUM 3D TILT EFFECT
+               ========================================================================== */
+            const tiltElements = document.querySelectorAll('.tilt-element');
+            tiltElements.forEach(el => {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                    const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10; // Max 10deg
+                    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+                    el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
+
+            /* ==========================================================================
+               10. MAGNETIC BUTTONS & RIPPLE
+               ========================================================================== */
+            document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
+                const btn = wrap.querySelector('button');
+                if(!btn) return;
+                wrap.addEventListener('mousemove', (e) => {
+                    const rect = wrap.getBoundingClientRect();
+                    const x = (e.clientX - rect.left - rect.width / 2) * 0.3;
+                    const y = (e.clientY - rect.top - rect.height / 2) * 0.3;
+                    btn.style.transform = `translate(${x}px, ${y}px)`;
+                });
+                wrap.addEventListener('mouseleave', () => btn.style.transform = `translate(0px, 0px)`);
+            });
+
+            document.querySelectorAll('.ripple-wrap').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const circle = document.createElement('span');
+                    circle.classList.add('ripple');
+                    circle.style.left = `${e.clientX - rect.left}px`;
+                    circle.style.top = `${e.clientY - rect.top}px`;
+                    this.appendChild(circle);
+                    setTimeout(() => circle.remove(), 800);
+                });
+            });
+
+            /* ==========================================================================
+               11. JS PARTICLE BACKGROUND (CANVAS)
+               ========================================================================== */
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    // Using brand colors slightly transparent
+                    const colors = ['rgba(225, 6, 0, 0.3)', 'rgba(0, 58, 112, 0.2)', 'rgba(63, 169, 245, 0.2)'];
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    // Wrap around
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.y > canvas.height) this.y = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                const numParticles = window.innerWidth > 768 ? 100 : 40;
+                for (let i = 0; i < numParticles; i++) particles.push(new Particle());
+            }
+            
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(animateParticles);
+            }
+            
+            initParticles();
+            animateParticles();
+
+            /* ==========================================================================
+               13. NEWS DETAILS MODAL LOGIC
+               ========================================================================== */
+            const newsModal = document.getElementById('news-modal');
+            const nmCloseBtn = document.getElementById('nm-close-btn');
+            const nmCloseOverlay = document.getElementById('nm-close-overlay');
+            
+            const nmImg = document.getElementById('nm-img');
+            const nmBadge = document.getElementById('nm-badge');
+            const nmTitle = document.getElementById('nm-title');
+            const nmDesc = document.getElementById('nm-desc');
+            const nmMeta = document.getElementById('nm-meta');
+            const nmArticle = document.getElementById('nm-article');
+
+            const openNewsDetailsModal = (card) => {
+                const imgWrap = card.querySelector('.nc-img');
+                const badge = card.querySelector('.nc-badge');
+                const title = card.querySelector('.nc-title');
+                const desc = card.querySelector('.nc-desc');
+                const meta = card.querySelector('.nc-meta');
+
+                if(imgWrap) nmImg.src = imgWrap.src;
+                if(badge) {
+                    nmBadge.textContent = badge.textContent;
+                    const cardColor = card.style.getPropertyValue('--card-color') || 'var(--accent-red)';
+                    nmBadge.style.backgroundColor = cardColor;
+                }
+                if(title) nmTitle.textContent = title.textContent;
+                if(desc) nmDesc.textContent = desc.textContent;
+                if(meta) nmMeta.innerHTML = meta.innerHTML;
+
+                if (nmArticle) {
+                    nmArticle.innerHTML = `
+                        <p style="margin-bottom: 20px;">The recent developments surrounding this story have sent ripples across the global landscape, challenging preconceived notions and forcing industry leaders to adapt at an unprecedented pace. As we delve deeper into the core mechanics of this shift, it becomes increasingly clear that the implications will be felt for years to come. Analysts predict a multi-faceted impact, influencing not just the immediate stakeholders but the broader socioeconomic fabric.</p>
+                        <p style="margin-bottom: 20px;">At the heart of this transformation is a relentless drive for innovation and efficiency. Early indicators suggest that organizations embracing these changes are already seeing a significant competitive advantage. The integration of advanced methodologies has streamlined operations, reduced overheads, and opened new avenues for growth. However, this transition is not without its hurdles. Transitioning legacy systems and upskilling the workforce remain critical challenges that require substantial investment and strategic foresight.</p>
+                        <p style="margin-bottom: 20px;">Furthermore, the regulatory environment is struggling to keep pace with the rapid technological advancements. Policymakers are faced with the delicate task of fostering innovation while ensuring robust consumer protections and maintaining market stability. Recent legislative proposals aim to strike this balance, but consensus remains elusive. The ongoing dialogue between public and private sectors will be crucial in shaping a sustainable framework that encourages progress without compromising ethical standards.</p>
+                        <p style="margin-bottom: 20px;">From a consumer perspective, the reception has been largely positive, albeit with a healthy dose of skepticism. The promise of enhanced convenience and personalized experiences is highly appealing, yet concerns regarding data privacy and security continue to linger. Transparency and trust will be the defining factors in determining long-term adoption rates. Companies that prioritize user agency and clear communication are poised to build lasting loyalty in this highly competitive arena.</p>
+                        <p style="margin-bottom: 20px;">Looking ahead, experts agree that we are only witnessing the tip of the iceberg. The convergence of various emerging trends—such as artificial intelligence, decentralized networks, and sustainable practices—will likely catalyze even more profound disruptions. Preparing for this future requires a proactive mindset and a willingness to embrace uncertainty. Those who cling to outdated paradigms risk being left behind in a world that is evolving faster than ever before.</p>
+                        <p>In conclusion, this pivotal moment serves as a wake-up call for stakeholders across the spectrum. The window of opportunity is finite, and the cost of inaction is steep. By fostering a culture of continuous learning, collaboration, and ethical responsibility, we can navigate these uncharted waters and emerge stronger, more resilient, and better equipped to tackle the challenges of tomorrow.</p>
+                    `;
+                }
+
+                newsModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            // Bind existing cards
+            const newsCards = document.querySelectorAll('.news-card:not(#reels .news-card)');
+            newsCards.forEach(card => {
+                card.addEventListener('click', () => openNewsDetailsModal(card));
+            });
+
+            const closeModal = () => {
+                newsModal.classList.remove('active');
+                
+                // Only restore body scrolling if the category full-modal isn't active
+                if (!document.getElementById('category-full-modal').classList.contains('active')) {
+                    document.body.style.overflow = '';
+                }
+            };
+
+            nmCloseBtn.addEventListener('click', closeModal);
+            nmCloseOverlay.addEventListener('click', closeModal);
+            
+            /* ==========================================================================
+               13.5 FULL SCREEN CATEGORY MODAL LOGIC
+               ========================================================================== */
+            const catFullModal = document.getElementById('category-full-modal');
+            const cfmGrid = document.getElementById('cfm-grid');
+            const cfmTitle = document.getElementById('cfm-title');
+            const cfmClose = document.getElementById('cfm-close');
+            
+            // Clone Header and Footer to simulate new page (stripping IDs to prevent JS conflicts)
+            document.getElementById('cfm-header').innerHTML = document.getElementById('main-header').innerHTML;
+            
+            // Properly clone the footer content including its layout grid
+            const originalFooter = document.querySelector('footer');
+            document.getElementById('cfm-footer').innerHTML = originalFooter.innerHTML;
+            // Ensure the footer container inside the modal gets the same dark background
+            document.getElementById('cfm-footer').style.background = 'linear-gradient(to bottom, #0a192f, #020c1b)';
+            document.getElementById('cfm-footer').style.color = '#fff';
+            document.getElementById('cfm-footer').style.padding = '120px 40px 40px';
+            document.getElementById('cfm-footer').style.position = 'relative';
+            document.getElementById('cfm-footer').style.overflow = 'hidden';
+
+            // FIX: Force cloned reveal elements to be visible in the modal
+            document.getElementById('cfm-footer').querySelectorAll('.reveal').forEach(el => {
+                el.classList.add('active');
+            });
+
+            document.getElementById('cfm-header').querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            document.getElementById('cfm-footer').querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+
+            document.querySelectorAll('.sh-view').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.target.closest('section');
+                    if(!section) return;
+                    
+                    const titleHtml = section.querySelector('.sh-title').innerHTML;
+                    const sectionColor = section.style.getPropertyValue('--section-color');
+                    
+                    cfmTitle.innerHTML = titleHtml;
+                    catFullModal.style.setProperty('--section-color', sectionColor);
+                    
+                    // Reset Grid
+                    cfmGrid.innerHTML = '';
+                    
+                    const originalCards = section.querySelectorAll('.news-card');
+                    
+                    // Duplicate cards 3 times to create a grid of 12 for the demo effect
+                    for(let i = 0; i < 3; i++) {
+                        originalCards.forEach(card => {
+                            const clone = card.cloneNode(true);
+                            // Adjust styling slightly to fit perfectly in 4-column modal
+                            clone.style.height = '100%';
+                            if(section.id === 'reels') clone.style.height = '450px';
+                            
+                            cfmGrid.appendChild(clone);
+                            
+                            // Re-bind the exact news modal opening logic for the newly cloned cards!
+                            if(section.id !== 'reels') {
+                                clone.addEventListener('click', () => openNewsDetailsModal(clone));
+                            }
+                        });
+                    }
+                    
+                    catFullModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    catFullModal.scrollTop = 0;
+                });
+            });
+
+            cfmClose.addEventListener('click', () => {
+                catFullModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            /* ==========================================================================
+               14. MISC & UTILS
+               ========================================================================== */
+            document.getElementById('back-to-top').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            
+            document.getElementById('nl-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Welcome to the Premium Release Media Network Newsletter!');
+                e.target.reset();
+            });
+
+        });
+    </script>
+</body>
+</html>
