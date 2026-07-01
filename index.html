@@ -58,6 +58,12 @@
             /* Easing */
             --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Premium Golden Touch */
+            --gold-gradient: linear-gradient(135deg, #FFDF00, #D4AF37, #996515);
+            --gold-border: #D4AF37;
+            --gold-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            --gold-glow: 0 0 20px rgba(212, 175, 55, 0.6);
         }
 
         /* Dark Mode */
@@ -97,7 +103,7 @@
            ========================================================================== */
         .cursor-dot, .cursor-outline {
             position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-            border-radius: 50%; z-index: 9999999; pointer-events: none;
+            border-radius: 50%; z-index: 999999999; pointer-events: none;
         }
         .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-red); transition: width 0.2s, height 0.2s, background-color 0.2s; }
         .cursor-outline { width: 45px; height: 45px; border: 2px solid rgba(225, 6, 0, 0.4); transition: width 0.15s, height 0.15s, border-color 0.15s; }
@@ -180,7 +186,7 @@
         /* Secondary Category Bar (Scrollable) */
         .nav-cats-wrap { border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
         .nav-cats {
-            max-width: 1600px; margin: 0 auto; display: flex; gap: 30px; padding: 15px 40px;
+            max-width: 1600px; margin: 0 auto; display: flex; justify-content: center; gap: 30px; padding: 15px 40px;
             overflow-x: auto; scrollbar-width: none; font-family: var(--font-pop); font-weight: 600; font-size: 0.95rem;
         }
         .nav-cats::-webkit-scrollbar { display: none; }
@@ -202,7 +208,13 @@
            ========================================================================== */
         .hero-slider {
             position: relative; height: 85vh; min-height: 650px; margin: 20px 40px;
-            border-radius: 30px; overflow: hidden; box-shadow: var(--glass-shadow);
+            border-radius: 30px; overflow: hidden; 
+            border: 2px solid var(--gold-border);
+            box-shadow: var(--gold-shadow);
+            transition: box-shadow 0.4s ease;
+        }
+        .hero-slider:hover {
+            box-shadow: var(--gold-glow);
         }
         .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; display: flex; align-items: flex-end; padding: 80px 60px;}
         .slide.active { opacity: 1; z-index: 2; }
@@ -266,6 +278,19 @@
         .tc-content h3 { font-size: 1.2rem; margin-bottom: 10px; line-height: 1.4; }
         .tc-content p { font-size: 0.9rem; color: var(--text-secondary); }
 
+        /* Latest News Slider */
+        .latest-track {
+            display: flex; gap: 35px; overflow-x: auto; padding-bottom: 30px; margin-bottom: 70px;
+            scroll-snap-type: x mandatory; scrollbar-width: none; cursor: grab;
+        }
+        .latest-track::-webkit-scrollbar { display: none; }
+        .latest-track:active { cursor: grabbing; }
+        .latest-track .news-card {
+            flex: 0 0 400px;
+            max-width: 400px;
+            scroll-snap-align: start;
+        }
+
         /* ==========================================================================
            7. MAIN LAYOUT (Grid)
            ========================================================================== */
@@ -291,18 +316,19 @@
         .news-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 35px; margin-bottom: 70px; position: relative;}
         
         .news-card {
-            background: var(--bg-primary); border-radius: 24px; border: 1px solid var(--border-color);
-            overflow: hidden; box-shadow: var(--glass-shadow); display: flex; flex-direction: column;
+            background: var(--bg-primary); border-radius: 24px; 
+            border: 1px solid var(--gold-border);
+            overflow: hidden; box-shadow: var(--gold-shadow); display: flex; flex-direction: column;
             position: relative; transform-style: preserve-3d; transition: all 0.4s;
         }
         /* Animated Gradient Border on Hover */
         .news-card::before {
-            content: ''; position: absolute; inset: -2px; background: linear-gradient(45deg, transparent, var(--card-color), transparent);
+            content: ''; position: absolute; inset: -2px; background: var(--gold-gradient);
             z-index: -1; border-radius: 26px; opacity: 0; transition: 0.4s;
         }
         .news-card:hover::before { opacity: 1; animation: spinBorder 3s linear infinite; }
-        .news-card:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.12); transform: translateY(-5px); border-color: transparent;}
-        body.dark-theme .news-card:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+        .news-card:hover { box-shadow: var(--gold-glow); transform: translateY(-5px); border-color: transparent;}
+        body.dark-theme .news-card:hover { box-shadow: 0 25px 50px rgba(212, 175, 55, 0.4); }
 
         .nc-img-wrap { position: relative; width: 100%; height: 280px; overflow: hidden; }
         .nc-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-out-expo); }
@@ -376,10 +402,10 @@
         .video-card:hover .vc-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         .vc-duration { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
 
-        /* Masonry Gallery */
-        .masonry-grid { column-count: 3; column-gap: 30px; margin-bottom: 70px; }
-        .masonry-item { break-inside: avoid; margin-bottom: 30px; border-radius: 20px; overflow: hidden; position: relative; box-shadow: var(--glass-shadow); }
-        .mi-img { width: 100%; display: block; transition: 0.5s; }
+        /* Photo Gallery Grid (Uniform Size) */
+        .masonry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 70px; }
+        .masonry-item { border-radius: 20px; overflow: hidden; position: relative; box-shadow: var(--glass-shadow); aspect-ratio: 3/2; }
+        .mi-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: 0.5s; }
         .masonry-item:hover .mi-img { transform: scale(1.1); }
         .mi-overlay { position: absolute; inset: 0; background: rgba(225,6,0,0.8); opacity: 0; transition: 0.4s; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; backdrop-filter: blur(5px);}
         .masonry-item:hover .mi-overlay { opacity: 1; }
@@ -525,8 +551,9 @@
         
         /* Media Queries */
         @media (max-width: 1400px) { .main-layout { grid-template-columns: 1fr; } .sidebar { position: relative; top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; } .footer-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 900px) { .news-grid, .video-grid { grid-template-columns: 1fr; } .sidebar { grid-template-columns: 1fr; } .hero-title { font-size: 3.5rem; } .masonry-grid { column-count: 2; } .nav-actions .btn-primary { display: none; } }
-        @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .masonry-grid { column-count: 1; } .newsletter-section { padding: 50px 20px; } .hero { padding: 40px 20px; } .so-input { font-size: 2.5rem; } }
+        @media (max-width: 1100px) { .cfm-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px) { .latest-track .news-card { min-width: 100%; } .news-grid, .video-grid { grid-template-columns: 1fr; } .sidebar { grid-template-columns: 1fr; } .hero-title { font-size: 3.5rem; } .masonry-grid { grid-template-columns: repeat(2, 1fr); } .nav-actions .btn-primary { display: none; } }
+        @media (max-width: 600px) { .cfm-grid { grid-template-columns: 1fr; } .footer-grid { grid-template-columns: 1fr; } .masonry-grid { grid-template-columns: 1fr; } .newsletter-section { padding: 50px 20px; } .hero { padding: 40px 20px; } .so-input { font-size: 2.5rem; } }
     </style>
 </head>
 <body>
@@ -710,6 +737,89 @@
         </div>
     </section>
 
+    <!-- LATEST NEWS SECTION (Full Width) -->
+    <div style="max-width: 1600px; margin: 0 auto; padding: 0 40px;">
+        <section id="latest" style="--section-color: var(--accent-red);">
+            <i class="ph-duotone ph-newspaper cat-mascot"></i>
+            <div class="section-head reveal">
+                <h2 class="sh-title"><i class="ph-duotone ph-clock sh-icon"></i> Latest News</h2>
+                <!-- View More button removed from this section -->
+            </div>
+            
+            <div class="latest-track" id="latest-track">
+                <!-- Latest Card 1 -->
+                <article class="news-card reveal tilt-element interactable" style="--card-color: var(--accent-red);">
+                    <div class="nc-ribbon"></div>
+                    <div class="nc-img-wrap">
+                            <div class="nc-badge">Global</div>
+                            <img src="https://www.livemint.com/lm-img/img/2024/11/13/original/Lead_Image_1731486065647.jpg?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Global News">
+                            <div class="nc-overlay"></div>
+                        </div>
+                        <div class="nc-content">
+                            <div class="nc-meta">
+                                <div class="nc-meta-left"><span>Jun 28</span> <span><i class="ph-fill ph-clock"></i> 5 Min</span></div>
+                                <span><i class="ph-fill ph-eye"></i> 45K</span>
+                            </div>
+                            <h3 class="nc-title">Global Summit Concludes with Historic Climate Agreements</h3>
+                            <p class="nc-desc">World leaders have finally reached a consensus on the new carbon emission targets for the next decade.</p>
+                        </div>
+                    </article>
+
+                    <!-- Latest Card 2 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--accent-red);">
+                        <div class="nc-img-wrap">
+                            <div class="nc-badge">Science</div>
+                            <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Science">
+                            <div class="nc-overlay"></div>
+                        </div>
+                        <div class="nc-content">
+                            <div class="nc-meta">
+                                <div class="nc-meta-left"><span>Jun 28</span> <span><i class="ph-fill ph-clock"></i> 4 Min</span></div>
+                                <span><i class="ph-fill ph-eye"></i> 32K</span>
+                            </div>
+                            <h3 class="nc-title">New Breakthrough in Renewable Energy Storage Unveiled</h3>
+                            <p class="nc-desc">Scientists have developed a new battery technology capable of storing solar energy for months without degradation.</p>
+                        </div>
+                    </article>
+                    
+                    <!-- Latest Card 3 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--accent-red);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Society</div><img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Society"><div class="nc-overlay"></div></div>
+                        <div class="nc-content">
+                            <div class="nc-meta"><div class="nc-meta-left"><span>Jun 28</span><span><i class="ph-fill ph-clock"></i> 6 Min</span></div><span><i class="ph-fill ph-eye"></i> 88K</span></div>
+                            <h3 class="nc-title">Urban Development Project Aims to Redefine City Living</h3>
+                            <p class="nc-desc">A major metropolitan area is completely redesigning its downtown to prioritize pedestrian zones and green spaces.</p>
+                        </div>
+                    </article>
+
+                    <!-- Latest Card 4 -->
+                    <article class="news-card reveal tilt-element interactable" style="--card-color: var(--accent-red);">
+                        <div class="nc-img-wrap"><div class="nc-badge">Discovery</div><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop" class="nc-img" alt="Discovery"><div class="nc-overlay"></div></div>
+                    <div class="nc-content">
+                        <div class="nc-meta"><div class="nc-meta-left"><span>Jun 28</span><span><i class="ph-fill ph-clock"></i> 3 Min</span></div><span><i class="ph-fill ph-eye"></i> 54K</span></div>
+                        <h3 class="nc-title">Deep Sea Expedition Discovers Previously Unknown Marine Life</h3>
+                        <p class="nc-desc">Researchers exploring the Marianas Trench have documented over twenty new species in a single dive.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <!-- HORIZONTAL SPONSORSHIP BANNER -->
+    <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+        <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+            <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Premium Sponsor</div>
+                    <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">The Future of AI & Global Finance</h3>
+                    <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Discover groundbreaking strategies at the intersection of quantum computing and decentralized markets. Reserve your virtual seat today.</p>
+                </div>
+                <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Learn More</button></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Grid Layout -->
     <div class="main-layout">
         
@@ -782,6 +892,21 @@
                 </div>
             </section>
 
+            <!-- Sponsorship Box -->
+            <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+                <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+                    <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Premium Sponsor</div>
+                            <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">The Future of AI & Global Finance</h3>
+                            <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Discover groundbreaking strategies at the intersection of quantum computing and decentralized markets. Reserve your virtual seat today.</p>
+                        </div>
+                        <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Learn More</button></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TECHNOLOGY SECTION -->
             <section id="tech" style="--section-color: var(--cat-tech);">
                 <i class="ph-duotone ph-cpu cat-mascot"></i>
@@ -827,6 +952,21 @@
                     </article>
                 </div>
             </section>
+
+            <!-- Sponsorship Box -->
+            <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+                <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+                    <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Premium Sponsor</div>
+                            <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">Unlock Peak Human Potential</h3>
+                            <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Our advanced bio-tracking suites provide data-driven insights into your health and wellness goals. Start your optimization journey now.</p>
+                        </div>
+                        <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Get Started</button></div>
+                    </div>
+                </div>
+            </div>
 
             <!-- SPORTS SECTION -->
             <section id="sports" style="--section-color: var(--cat-sports);">
@@ -874,79 +1014,20 @@
                 </div>
             </section>
 
-
-
-
-
-
-
-
-
-
-            <!-- REELS SECTION (Added as requested) -->
-            <section id="reels" style="--section-color: #E1306C;">
-                <i class="ph-duotone ph-instagram-logo cat-mascot"></i>
-                <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-instagram-logo sh-icon"></i> Release Reels</h2>
-                    <a href="#" class="sh-view interactable">View All <i class="ph-bold ph-arrow-right"></i></a>
+            <!-- Sponsorship Box -->
+            <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+                <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+                    <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Elite Partner</div>
+                            <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">Elite Athlete Performance Gear</h3>
+                            <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Designed for champions, engineered by science. Shop the official collection worn by top athletes globally.</p>
+                        </div>
+                        <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Shop Now</button></div>
+                    </div>
                 </div>
-                
-                <div class="news-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                    <!-- Reel Card 1 -->
-                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
-                        <div class="nc-img-wrap" style="height: 100%;">
-                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTI-NEuRFx1LqAySLArjINLy9-86ybFZv1lbBiFhxZJ-D9wKpmRrLM9zI8&s=10?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 1">
-                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
-                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
-                            </div>
-                        </div>
-                    </article>
-                    <!-- Reel Card 2 -->
-                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
-                        <div class="nc-img-wrap" style="height: 100%;">
-                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
-                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 2">
-                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
-                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
-                            </div>
-                        </div>
-                    </article>
-                    <!-- Reel Card 3 -->
-                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
-                        <div class="nc-img-wrap" style="height: 100%;">
-                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
-                            <img src="https://static.independent.co.uk/2026/06/26/15/2280563841..?quality=75&width=640&crop=3%3A2%2Csmart&trim=104%2C0%2C104%2C0&auto=webp?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 3">
-                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
-                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
-                            </div>
-                        </div>
-                    </article>
-                    <!-- Reel Card 4 -->
-                    <article class="news-card reveal tilt-element interactable" style="--card-color: #E1306C; height: 450px;">
-                        <div class="nc-img-wrap" style="height: 100%;">
-                            <div class="nc-badge" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">Reel</div>
-                            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&h=800&auto=format&fit=crop" class="nc-img" alt="Reel 4">
-                            <div class="nc-overlay" style="display:flex; align-items:center; justify-content:center;">
-                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
+            </div>
 
             <!-- POLITICAL SECTION -->
             <section id="politics" style="--section-color: var(--cat-politics);">
@@ -992,6 +1073,21 @@
                 </div>
             </section>
 
+            <!-- Sponsorship Box -->
+            <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+                <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+                    <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Global Sponsor</div>
+                            <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">Secure Your Future Sovereignty</h3>
+                            <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Comprehensive wealth management and strategic international consulting services for the modern diplomat.</p>
+                        </div>
+                        <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Consult Now</button></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- STYLE SECTION -->
             <section id="style" style="--section-color: var(--cat-style);">
                 <i class="ph-duotone ph-sparkle cat-mascot"></i>
@@ -1035,6 +1131,21 @@
                     </article>
                 </div>
             </section>
+
+            <!-- Sponsorship Box -->
+            <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+                <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+                    <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Luxury Partner</div>
+                            <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">Define Your Personal Style</h3>
+                            <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Curated high-fashion accessories that blend classic elegance with modern innovation.</p>
+                        </div>
+                        <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Explore Collection</button></div>
+                    </div>
+                </div>
+            </div>
 
             <!-- AUTOMOBILE SECTION -->
             <section id="auto" style="--section-color: var(--cat-auto);">
@@ -1190,6 +1301,21 @@
             </div>
 
         </aside>
+    </div>
+
+    <!-- Additional Sponsorship Box Above Newsletter -->
+    <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+        <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+            <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Global Partner</div>
+                    <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">Your Brand Here</h3>
+                    <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Drive global engagement through Release Media Network's premium audience.</p>
+                </div>
+                <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Get In Touch</button></div>
+            </div>
+        </div>
     </div>
 
     <!-- Full Width Newsletter Section -->
@@ -1404,26 +1530,32 @@
             setTimeout(typeEffect, 3000); // Start after preloader
 
             /* ==========================================================================
-               7. DRAG TO SCROLL (TRENDING CAROUSEL)
+               7. DRAG TO SCROLL (CAROUSELS)
                ========================================================================== */
-            const slider = document.getElementById('trending-track');
-            let isDown = false; let startX; let scrollLeft;
+            const setupDragScroll = (sliderId) => {
+                const slider = document.getElementById(sliderId);
+                if(!slider) return;
+                let isDown = false; let startX; let scrollLeft;
 
-            slider.addEventListener('mousedown', (e) => {
-                isDown = true;
-                slider.style.scrollSnapType = 'none'; // Disable snap while dragging
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-            });
-            slider.addEventListener('mouseleave', () => { isDown = false; slider.style.scrollSnapType = 'x mandatory'; });
-            slider.addEventListener('mouseup', () => { isDown = false; slider.style.scrollSnapType = 'x mandatory'; });
-            slider.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 2; // Scroll speed
-                slider.scrollLeft = scrollLeft - walk;
-            });
+                slider.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    slider.style.scrollSnapType = 'none'; // Disable snap while dragging
+                    startX = e.pageX - slider.offsetLeft;
+                    scrollLeft = slider.scrollLeft;
+                });
+                slider.addEventListener('mouseleave', () => { isDown = false; slider.style.scrollSnapType = 'x mandatory'; });
+                slider.addEventListener('mouseup', () => { isDown = false; slider.style.scrollSnapType = 'x mandatory'; });
+                slider.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - slider.offsetLeft;
+                    const walk = (x - startX) * 2; // Scroll speed
+                    slider.scrollLeft = scrollLeft - walk;
+                });
+            };
+
+            setupDragScroll('trending-track');
+            setupDragScroll('latest-track');
 
             /* ==========================================================================
                8. SCROLL REVEAL (INTERSECTION OBSERVER)
@@ -1657,6 +1789,10 @@
                             // Adjust styling slightly to fit perfectly in 4-column modal
                             clone.style.height = '100%';
                             if(section.id === 'reels') clone.style.height = '450px';
+                            
+                            // FIX: Force all cloned cards to be immediately visible. 
+                            // (Otherwise they remain hidden at opacity: 0 due to the scroll reveal animation)
+                            clone.classList.add('active');
                             
                             cfmGrid.appendChild(clone);
                             
