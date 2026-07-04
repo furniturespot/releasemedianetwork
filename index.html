@@ -125,7 +125,7 @@
         .pl-globe { font-size: 8rem; color: var(--cat-release); animation: spinGlobe 4s linear infinite; margin-bottom: 20px;}
         .pl-title { font-size: 4rem; font-weight: 900; background: linear-gradient(45deg, var(--accent-red), #ff5555); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; animation: pulse 2s infinite;}
         .pl-bar-wrap { width: 400px; height: 6px; background: var(--border-color); border-radius: 6px; overflow: hidden; position: relative; margin-top:20px;}
-        .pl-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent-red); width: 0%; box-shadow: 0 0 10px var(--accent-red); animation: fillBar 2.5s var(--ease-out-expo) forwards; }
+        .pl-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent-red); width: 0%; box-shadow: 0 0 10px var(--accent-red); animation: fillBar 0.3s var(--ease-out-expo) forwards; }
         .pl-flying-news { position: absolute; font-size: 2rem; color: var(--text-secondary); opacity: 0.2; animation: flyNews 3s linear infinite; }
 
         /* ==========================================================================
@@ -146,16 +146,22 @@
         .ticker-item { cursor: none; font-weight: 600; transition: color 0.3s; }
         .ticker-item:hover { color: var(--cat-release); text-decoration: underline; }
 
-        header { position: sticky; top: 0; z-index: 9999; background: var(--bg-primary); transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s; }
+        header { position: sticky; top: 0; z-index: 9999; background: var(--bg-primary); transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s, padding 0.4s; }
         header.scrolled {
             background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             box-shadow: var(--glass-shadow); border-bottom: 1px solid rgba(150,150,150,0.1);
         }
         
         /* Top Header Action Bar */
-        .nav-main { max-width: 1600px; margin: 0 auto; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 2.5rem; font-weight: 900; display: flex; align-items: center; gap: 12px; letter-spacing: -1px; }
-        .logo i { color: var(--cat-release); font-size: 2.8rem; animation: floatSmall 3s infinite; }
+        .nav-main { max-width: 1600px; margin: 0 auto; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; transition: padding 0.4s ease; }
+        header.scrolled .nav-main { padding: 5px 40px; }
+        
+        .logo { font-size: 2.5rem; font-weight: 900; display: flex; align-items: center; gap: 12px; letter-spacing: -1px; transition: font-size 0.4s ease; }
+        header.scrolled .logo { font-size: 1.8rem; }
+        
+        .logo i, .logo img { color: var(--cat-release); font-size: 2.8rem; width: 2.8rem; height: 2.8rem; animation: floatSmall 3s infinite; transition: all 0.4s ease; object-fit: contain; }
+        header.scrolled .logo i, header.scrolled .logo img { font-size: 2.2rem; width: 2.2rem; height: 2.2rem; }
+        
         .logo span { color: var(--accent-red); }
         
         .nav-actions { display: flex; align-items: center; gap: 15px; }
@@ -164,6 +170,8 @@
             display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--text-primary);
             transition: all 0.3s var(--ease-spring); position: relative; overflow: hidden;
         }
+        header.scrolled .icon-btn { width: 38px; height: 38px; font-size: 1.2rem; }
+        
         .icon-btn:hover { background: var(--accent-red); color: white; transform: scale(1.1) rotate(5deg); border-color: transparent; box-shadow: var(--glow-shadow); }
         .lang-sel { font-family: var(--font-accent); font-weight: 700; background: transparent; border: none; color: var(--text-primary); cursor: none; padding: 0 10px;}
 
@@ -172,8 +180,10 @@
             background: linear-gradient(135deg, var(--accent-red), #ff2a2a); color: white; border: none;
             padding: 14px 35px; border-radius: 30px; font-weight: 700; font-size: 1rem;
             box-shadow: 0 10px 20px rgba(225, 6, 0, 0.3); position: relative; overflow: hidden;
-            display: flex; align-items: center; gap: 10px; transition: transform 0.3s, box-shadow 0.3s;
+            display: flex; align-items: center; gap: 10px; transition: transform 0.3s, box-shadow 0.3s, padding 0.4s ease, font-size 0.4s ease;
         }
+        header.scrolled .btn-primary { padding: 10px 25px; font-size: 0.9rem; }
+        
         .btn-primary::before {
             content:''; position:absolute; top:0; left:-100%; width:50%; height:100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
@@ -181,6 +191,11 @@
         }
         .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px rgba(225, 6, 0, 0.5); }
         .btn-primary:hover::before { left: 150%; }
+        
+        /* Override red shadow to golden for the header subscribe button */
+        .nav-actions .btn-primary { box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+        .nav-actions .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6); }
+
         .magnetic-wrap { display: inline-block; padding: 10px; }
 
         /* Secondary Category Bar (Scrollable) */
@@ -306,7 +321,8 @@
             background: var(--section-color, var(--accent-red)); border-radius: 5px;
         }
         .sh-title { font-size: 2.5rem; display: flex; align-items: center; gap: 15px; font-weight: 800; }
-        .sh-icon { color: var(--section-color, var(--accent-red)); }
+        .sh-icon { color: var(--section-color, var(--accent-red)); animation: floatSmall 3.5s ease-in-out infinite; display: inline-block; }
+        img.sh-icon { width: 2.5rem; height: 2.5rem; object-fit: contain; animation: floatSmall 3.5s ease-in-out infinite; }
         .sh-view { font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .sh-view:hover { color: var(--section-color, var(--accent-red)); transform: translateX(5px); }
 
@@ -365,7 +381,8 @@
         .action-btn:hover { background: var(--card-color); color: white; transform: scale(1.15) translateY(-5px); border-color: transparent; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
         /* Floating Mascots per category */
-        .cat-mascot { position: absolute; z-index: -1; font-size: 18rem; color: var(--section-color); opacity: 0.03; top: 10%; right: -5%; pointer-events: none; animation: floatComplex 10s infinite alternate; }
+        .cat-mascot { display: none; }
+        img.cat-mascot { display: none; }
 
         /* ==========================================================================
            9. SIDEBAR WIDGETS
@@ -429,20 +446,69 @@
         /* ==========================================================================
            12. MEGA FOOTER
            ========================================================================== */
-        footer { background: linear-gradient(to bottom, #0a192f, #020c1b); color: #fff; padding: 120px 40px 40px; position: relative; overflow: hidden; }
-        .footer-grid { max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 60px; position: relative; z-index: 2; margin-bottom: 80px; }
-        .footer-brand h2 { font-size: 3rem; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
-        .footer-brand p { color: #8892b0; line-height: 1.9; font-size: 1.15rem; margin-bottom: 40px; max-width: 450px;}
+        footer {
+            background: linear-gradient(to bottom, #0a0a0a, #000000);
+            color: #fff;
+            padding: 100px 40px 40px;
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--gold-border);
+        }
         
-        .footer-links h3 { font-size: 1.5rem; margin-bottom: 30px; color: #ccd6f6; font-weight: 800;}
-        .footer-links ul li { margin-bottom: 18px; }
-        .footer-links ul li a { color: #8892b0; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 1.1rem; }
-        .footer-links ul li a::before { content: '→'; opacity: 0; transform: translateX(-10px); transition: 0.3s; color: var(--accent-red); }
-        .footer-links ul li a:hover { color: #fff; transform: translateX(5px); }
-        .footer-links ul li a:hover::before { opacity: 1; transform: translateX(0); }
+        /* Subtle Grid Background for Professional Look */
+        footer::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px; z-index: 1; pointer-events: none;
+        }
 
-        .footer-bottom { max-width: 1600px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px; display: flex; justify-content: space-between; align-items: center; color: #8892b0; position: relative; z-index: 2; font-size: 1.1rem;}
-        .footer-blob { position: absolute; background: radial-gradient(circle, rgba(225,6,0,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(60px); pointer-events: none;}
+        .footer-grid {
+            max-width: 1600px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px;
+            position: relative; z-index: 2; margin-bottom: 80px;
+        }
+        .footer-brand h2 { font-size: 2.8rem; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; font-weight: 900;}
+        .footer-brand p { color: #a0aabf; line-height: 1.8; font-size: 1.1rem; margin-bottom: 30px; max-width: 450px;}
+        
+        .footer-links h3 {
+            font-size: 1.3rem; margin-bottom: 30px; color: #fff; font-weight: 800;
+            position: relative; padding-bottom: 15px;
+        }
+        .footer-links h3::after {
+            content: ''; position: absolute; left: 0; bottom: 0;
+            width: 40px; height: 3px; background: var(--gold-border); border-radius: 2px;
+        }
+        .footer-links ul li { margin-bottom: 15px; }
+        .footer-links ul li a {
+            color: #a0aabf; transition: 0.3s; display: inline-flex; align-items: center; font-size: 1.05rem; font-weight: 500;
+        }
+        .footer-links ul li a:hover { color: var(--gold-border); transform: translateX(8px); }
+
+        /* Mini Newsletter in Footer */
+        .footer-newsletter p { color: #a0aabf; font-size: 1rem; margin-bottom: 20px; line-height: 1.6;}
+        .fn-form { display: flex; background: rgba(255,255,255,0.05); border-radius: 30px; padding: 5px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .fn-form:focus-within { border-color: var(--gold-border); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+        .fn-form input { flex-grow: 1; border: none; background: transparent; padding: 0 20px; color: white; font-size: 0.95rem; outline: none;}
+        .fn-form button { background: var(--gold-gradient); color: black; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 800; transition: 0.3s;}
+        .fn-form button:hover { transform: scale(1.05); }
+
+        .footer-bottom {
+            max-width: 1600px; margin: 0 auto;
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: #a0aabf; position: relative; z-index: 2; font-size: 1rem;
+        }
+        
+        .footer-socials { display: flex; gap: 15px; }
+        .footer-socials a {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;
+            transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-socials a:hover { background: var(--gold-border); color: black; transform: translateY(-5px); border-color: transparent;}
+        .footer-blob { position: absolute; background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); pointer-events: none;}
         
         /* ==========================================================================
            13. SEARCH POPUP
@@ -621,7 +687,7 @@
     <header id="main-header">
         <div class="nav-main">
             <a href="#" class="logo interactable">
-                <i class="ph-fill ph-meteor"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgP1xL71NZ707dBaDmGzG1JLDJ6pkIAJRTR2IyLo2DG2aUYW4EtV_MuwtQm4ln-sniC_6tuHZbcX4rlrDIpahDsaRS7VEXy1ikc1CNXs8o7-Gi06MybUc7pAg-OPPBgdZw3E9biM2J7NYC7cEf1e23eHbroN-lQq6BWNTOAoIB3er2at3rCNl4fWcDIpcA/s320/1000260589.png" alt="Release Media Logo">
                 <div>Release <span>Media</span></div>
             </a>
             
@@ -657,19 +723,50 @@
         <div class="slide active">
             <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop" class="hero-bg" alt="Space Tech">
             <div class="hero-overlay"></div>
-            
-            <i class="ph-duotone ph-rocket mascot mascot-drone" style="color: var(--cat-tech);"></i>
-            <i class="ph-duotone ph-robot mascot mascot-reporter" style="color: var(--bg-primary); left: 5%; right: auto;"></i>
 
             <div class="hero-content">
                 <div class="hero-badge"><i class="ph-fill ph-fire"></i> Tech Release Exclusive</div>
-                <h1 class="hero-title">The Dawn of <span id="type-text"></span><span class="type-cursor"></span></h1>
+                <h1 class="hero-title">The Dawn of Quantum Global Networks</h1>
                 <div class="hero-meta">
                     <span><i class="ph-fill ph-clock"></i> 5 Min Read</span>
                     <span><i class="ph-fill ph-user-circle"></i> Dr. Alan Cole</span>
                     <span><i class="ph-fill ph-chat-circle"></i> 1,204 Comments</span>
                 </div>
                 <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: white; color: var(--accent-red); font-size: 1.1rem; padding: 18px 45px;">Read Full Story</button></div>
+            </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop" class="hero-bg" alt="City Future">
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content">
+                <div class="hero-badge" style="background: var(--cat-business);"><i class="ph-fill ph-trend-up"></i> Economy Watch</div>
+                <h1 class="hero-title">Sustainable AI Grids Power Next-Gen Cities</h1>
+                <div class="hero-meta">
+                    <span><i class="ph-fill ph-clock"></i> 7 Min Read</span>
+                    <span><i class="ph-fill ph-user-circle"></i> Sarah Jenkins</span>
+                    <span><i class="ph-fill ph-chat-circle"></i> 892 Comments</span>
+                </div>
+                <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: white; color: var(--cat-business); font-size: 1.1rem; padding: 18px 45px;">Read Full Story</button></div>
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2000&auto=format&fit=crop" class="hero-bg" alt="Biotech">
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content">
+                <div class="hero-badge" style="background: var(--cat-health);"><i class="ph-fill ph-flask"></i> Health Frontier</div>
+                <h1 class="hero-title">Breakthroughs in Genetic Biotechnology</h1>
+                <div class="hero-meta">
+                    <span><i class="ph-fill ph-clock"></i> 4 Min Read</span>
+                    <span><i class="ph-fill ph-user-circle"></i> Dr. Emily Chen</span>
+                    <span><i class="ph-fill ph-chat-circle"></i> 2,105 Comments</span>
+                </div>
+                <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: white; color: var(--cat-health); font-size: 1.1rem; padding: 18px 45px;">Read Full Story</button></div>
             </div>
         </div>
 
@@ -805,6 +902,89 @@
         </section>
     </div>
 
+
+
+
+
+    <!-- HORIZONTAL SPONSORSHIP BANNER -->
+    <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
+        <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
+            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1600&auto=format&fit=crop" class="ad-bg" alt="Sponsor Background">
+            <div class="ad-content" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 40px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="ad-badge" style="background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; margin-bottom: 15px;">Premium Sponsor</div>
+                    <h3 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; font-family: var(--font-display);">The Future of AI & Global Finance</h3>
+                    <p style="font-size: 1.1rem; color: #ccc; max-width: 800px; margin-bottom: 0;">Discover groundbreaking strategies at the intersection of quantum computing and decentralized markets. Reserve your virtual seat today.</p>
+                </div>
+                <div class="magnetic-wrap"><button class="btn-primary ripple-wrap" style="background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 1.1rem; padding: 15px 40px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);">Learn More</button></div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- PODCAST SECTION (Full Width) -->
+    <div style="max-width: 1600px; margin: 0 auto; padding: 0 40px;">
+        <section id="podcasts" style="--section-color: var(--cat-politics);">
+            <img src="https://api.iconify.design/noto:studio-microphone.svg" class="cat-mascot" alt="Podcast Mascot">
+            <div class="section-head reveal">
+                <h2 class="sh-title"><img src="https://api.iconify.design/noto:studio-microphone.svg" class="sh-icon" alt="Podcast"> Release Podcast</h2>
+            </div>
+            
+            <div class="latest-track" id="podcast-track">
+                <!-- Podcast Card 1 -->
+                <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                    <div class="nc-ribbon"></div>
+                    <div class="nc-img-wrap">
+                        <div class="nc-badge">Tech Talk</div>
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRLCwqWacORnvj0JotRZ44a8EnfJWgWRzpFqrkjmTOBrQ__j5gMkYI7rhe&s=10" class="nc-img" autoplay loop muted playsinline></video>
+                        <div class="nc-overlay"></div>
+                    </div>
+                    <div class="nc-content">
+                        <div class="nc-meta"><div class="nc-meta-left"><span>Ep. 42</span><span><i class="ph-fill ph-headphones"></i> 45 Min</span></div><span><i class="ph-fill ph-play-circle"></i> 12K</span></div>
+                        <h3 class="nc-title">The Future of AI Integration in Daily Life</h3>
+                    </div>
+                </article>
+
+                <!-- Podcast Card 2 -->
+                <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                    <div class="nc-img-wrap">
+                        <div class="nc-badge">Market Watch</div>
+                        <img src="https://wherewomenwork.s3-eu-west-1.amazonaws.com/insight/womenreturners-jobinterview-81261.jpg" class="nc-img" autoplay loop muted playsinline></img>
+                        <div class="nc-overlay"></div>
+                    </div>
+                    <div class="nc-content">
+                        <div class="nc-meta"><div class="nc-meta-left"><span>Ep. 41</span><span><i class="ph-fill ph-headphones"></i> 38 Min</span></div><span><i class="ph-fill ph-play-circle"></i> 8.5K</span></div>
+                        <h3 class="nc-title">Crypto Regulations and Global Finance</h3>
+                    </div>
+                </article>
+                
+                <!-- Podcast Card 3 -->
+                <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                    <div class="nc-img-wrap"><div class="nc-badge">Deep Dive</div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTfCG1iJyIcBb8zUg2Lm1kG7DheVWJuCUvy6FuIrUg7jDSSzb-kH2RAqo7&s=10" class="nc-img" autoplay loop muted playsinline></img><div class="nc-overlay"></div></div>
+                    <div class="nc-content">
+                        <div class="nc-meta"><div class="nc-meta-left"><span>Ep. 40</span><span><i class="ph-fill ph-headphones"></i> 52 Min</span></div><span><i class="ph-fill ph-play-circle"></i> 15K</span></div>
+                        <h3 class="nc-title">Exploring the Marianas Trench Findings</h3>
+                    </div>
+                </article>
+
+                <!-- Podcast Card 4 -->
+                <article class="news-card reveal tilt-element interactable" style="--card-color: var(--cat-politics);">
+                    <div class="nc-img-wrap"><div class="nc-badge">Innovators</div><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL9ohdpsLOjlW7_K2pNx7HWSCZwrVTlaEFZmNHEv5YHQ&s=10" class="nc-img" autoplay loop muted playsinline></img><div class="nc-overlay"></div></div>
+                    <div class="nc-content">
+                        <div class="nc-meta"><div class="nc-meta-left"><span>Ep. 39</span><span><i class="ph-fill ph-headphones"></i> 40 Min</span></div><span><i class="ph-fill ph-play-circle"></i> 10K</span></div>
+                        <h3 class="nc-title">Solid-State Batteries: The EV Revolution</h3>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+
     <!-- HORIZONTAL SPONSORSHIP BANNER -->
     <div style="max-width: 1600px; margin: 0 auto 70px auto; padding: 0 40px;">
         <div class="widget ad-widget reveal interactable tilt-element" style="padding: 40px 60px; display: flex; align-items: center; text-align: left; border: 1px solid var(--gold-border); box-shadow: var(--gold-shadow);">
@@ -828,9 +1008,9 @@
             
             <!-- BUSINESS SECTION -->
             <section id="business" style="--section-color: var(--cat-business);">
-                <i class="ph-duotone ph-briefcase cat-mascot"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhNoEnZ0YTFSnSsfySEiCnrjGMib4zgfNDRJzw6MZdhTWzH573FhagmgXedhTffNF05PtMi4D2ItOUxJVxt3MasiwervYH3rAp-8E6NtLZoDVKqpf0cXS2qycvjbnsP1NFLBGwWLcIC8sh0w1M90G5-iawAdMsoYT0SHwzs7XQP3MuvwwfZij0s5sEZIRc/s320/1000260584.png" class="cat-mascot" alt="Business Mascot">
                 <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-briefcase sh-icon"></i> Business Release</h2>
+                    <h2 class="sh-title"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhNoEnZ0YTFSnSsfySEiCnrjGMib4zgfNDRJzw6MZdhTWzH573FhagmgXedhTffNF05PtMi4D2ItOUxJVxt3MasiwervYH3rAp-8E6NtLZoDVKqpf0cXS2qycvjbnsP1NFLBGwWLcIC8sh0w1M90G5-iawAdMsoYT0SHwzs7XQP3MuvwwfZij0s5sEZIRc/s320/1000260584.png" class="sh-icon" alt="Business"> Business Release</h2>
                     <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
                 
@@ -909,9 +1089,9 @@
 
             <!-- TECHNOLOGY SECTION -->
             <section id="tech" style="--section-color: var(--cat-tech);">
-                <i class="ph-duotone ph-cpu cat-mascot"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgUi2NG620qJYCZ3Zzx5CKHzdSTFQkMw45LbSOF3LsspxBKesl6iWS37tZ4whY4Ozde-wzNqQbNxARZlbJkbczvwHZPWKmIstyFKiTWFeE5cJlIqlPhZoUPYKoIR1LC7GyOiAJxH88OpishKP7j0ZNh65gq1MFnPqkTmRex2brB-uRm3BHomvLKpOwF30Y/s320/1000260591.png" class="cat-mascot" alt="Tech Mascot">
                 <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-cpu sh-icon"></i> Technology Release</h2>
+                    <h2 class="sh-title"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgUi2NG620qJYCZ3Zzx5CKHzdSTFQkMw45LbSOF3LsspxBKesl6iWS37tZ4whY4Ozde-wzNqQbNxARZlbJkbczvwHZPWKmIstyFKiTWFeE5cJlIqlPhZoUPYKoIR1LC7GyOiAJxH88OpishKP7j0ZNh65gq1MFnPqkTmRex2brB-uRm3BHomvLKpOwF30Y/s320/1000260591.png" class="sh-icon" alt="Tech"> Technology Release</h2>
                     <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
                 <div class="news-grid">
@@ -970,9 +1150,9 @@
 
             <!-- SPORTS SECTION -->
             <section id="sports" style="--section-color: var(--cat-sports);">
-                <i class="ph-duotone ph-person-simple-run cat-mascot"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhwEidsrbzoFhcyGwEq429RLnpOhMbPgMbNLcYVdgvo93GJnf-FztebBjBhb0hxZe71nMprGln_FJLC_Ko1EALan2JmAHvU8j15ITGXgawgDDr4YpWHYB1YrsrPhK9PA1foAC1k_gGQ4rzb6UDf1fQGPQRG8SE4ddVmVdqKw7dZCp4wgQAw6dQQBIfv-kQ/s320/1000260590.png" class="cat-mascot" alt="Sports Mascot">
                 <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-person-simple-run sh-icon"></i> Sports Release</h2>
+                    <h2 class="sh-title"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhwEidsrbzoFhcyGwEq429RLnpOhMbPgMbNLcYVdgvo93GJnf-FztebBjBhb0hxZe71nMprGln_FJLC_Ko1EALan2JmAHvU8j15ITGXgawgDDr4YpWHYB1YrsrPhK9PA1foAC1k_gGQ4rzb6UDf1fQGPQRG8SE4ddVmVdqKw7dZCp4wgQAw6dQQBIfv-kQ/s320/1000260590.png" class="sh-icon" alt="Sports"> Sports Release</h2>
                     <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
                 <div class="news-grid">
@@ -1031,9 +1211,9 @@
 
             <!-- POLITICAL SECTION -->
             <section id="politics" style="--section-color: var(--cat-politics);">
-                <i class="ph-duotone ph-bank cat-mascot"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJYFypetEknuP_vF9OI5WwnR_rcbV2tHIkFpaLbuKOuJHtwr-FyJSkpwSRQxAiU3P02h0MGdjv-X0aDzGtH8zOiRIDizzRlVGOvN_zvVscPAuSJqDqVuyWBDPUN024TQQXpqCk82NheLezZyMTkb5fw36q9isl6oGV-K4-8Cj24VjGox3M4BBfTdN7-ds/s320/1000260588.png" class="cat-mascot" alt="Politics Mascot">
                 <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-bank sh-icon"></i> Political Release</h2>
+                    <h2 class="sh-title"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJYFypetEknuP_vF9OI5WwnR_rcbV2tHIkFpaLbuKOuJHtwr-FyJSkpwSRQxAiU3P02h0MGdjv-X0aDzGtH8zOiRIDizzRlVGOvN_zvVscPAuSJqDqVuyWBDPUN024TQQXpqCk82NheLezZyMTkb5fw36q9isl6oGV-K4-8Cj24VjGox3M4BBfTdN7-ds/s320/1000260588.png" class="sh-icon" alt="Politics"> Political Release</h2>
                     <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
                 <div class="news-grid">
@@ -1088,11 +1268,11 @@
                 </div>
             </div>
 
-            <!-- STYLE SECTION -->
+            <!-- FASHION SECTION -->
             <section id="style" style="--section-color: var(--cat-style);">
-                <i class="ph-duotone ph-sparkle cat-mascot"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjO3M77Hd6XiLMAPAuAr0h3qRyxpyqIey7ob-5UXr7_n7RQnSepPJvqJrx2WC17wySkrDYxtv1fMY8y0_dW9ffIBvf6GrbrK4rp-1zEIU11uOnuzxQODE9E1ynqOrtMcVG2ttd5hlxskCKU2GJYaP3h4HCO-B5EzbxWIuSAwHszuYT1t0_ZiODS8t6XWZg/s320/1000260682.png" class="cat-mascot" alt="Style Mascot">
                 <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-sparkle sh-icon"></i> Style Release</h2>
+                    <h2 class="sh-title"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjO3M77Hd6XiLMAPAuAr0h3qRyxpyqIey7ob-5UXr7_n7RQnSepPJvqJrx2WC17wySkrDYxtv1fMY8y0_dW9ffIBvf6GrbrK4rp-1zEIU11uOnuzxQODE9E1ynqOrtMcVG2ttd5hlxskCKU2GJYaP3h4HCO-B5EzbxWIuSAwHszuYT1t0_ZiODS8t6XWZg/s320/1000260682.png" class="sh-icon" alt="Style"> Fashion Release</h2>
                     <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
                 <div class="news-grid">
@@ -1149,9 +1329,9 @@
 
             <!-- AUTOMOBILE SECTION -->
             <section id="auto" style="--section-color: var(--cat-auto);">
-                <i class="ph-duotone ph-car-profile cat-mascot"></i>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVsEHHTcg6gdvKL6QJfspqCHT6KN0oBgY7bGnPEmBYAZdlGfL5p3_OmcbwIm1SmkrzFCCktVjnJ6TfIx9zCQB-nEu3t-NrxKGoeoqcDxQMclWpK8ATTvPM50Xygpq4pUf-lRco-jAJBkgT0Vd2BC89JvLKKUXMSU6j3WW-pmJ-h1m3zlxasnNgG_VZuPU/s320/1000260585.png" class="cat-mascot" alt="Auto Mascot">
                 <div class="section-head reveal">
-                    <h2 class="sh-title"><i class="ph-duotone ph-car-profile sh-icon"></i> Auto Release</h2>
+                    <h2 class="sh-title"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVsEHHTcg6gdvKL6QJfspqCHT6KN0oBgY7bGnPEmBYAZdlGfL5p3_OmcbwIm1SmkrzFCCktVjnJ6TfIx9zCQB-nEu3t-NrxKGoeoqcDxQMclWpK8ATTvPM50Xygpq4pUf-lRco-jAJBkgT0Vd2BC89JvLKKUXMSU6j3WW-pmJ-h1m3zlxasnNgG_VZuPU/s320/1000260585.png" class="sh-icon" alt="Auto"> Auto Release</h2>
                     <a href="#" class="sh-view interactable">View More <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
                 <div class="news-grid">
@@ -1336,11 +1516,20 @@
 
     <!-- Mega Footer -->
     <footer>
-        <div class="footer-blob" style="width: 800px; height: 800px; top: -400px; right: -200px; animation: pulse 8s infinite alternate;"></div>
+        <div class="footer-blob" style="width: 600px; height: 600px; bottom: -200px; left: -100px; animation: pulse 10s infinite alternate;"></div>
+        <div class="footer-blob" style="width: 400px; height: 400px; top: -100px; right: -50px; animation: pulse 8s infinite alternate-reverse; background: radial-gradient(circle, rgba(225, 6, 0, 0.08) 0%, transparent 70%);"></div>
+        
         <div class="footer-grid">
-            <div class="footer-brand reveal" style="grid-column: span 2;">
-                <h2><i class="ph-fill ph-meteor" style="color: var(--cat-release);"></i> Release Media</h2>
-                <p>"Every Story Matters." We deliver premium, globally recognized journalism engineered with award-winning design and uncompromised integrity. Founded in the pursuit of absolute truth.</p>
+            <div class="footer-brand reveal">
+                <h2><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgP1xL71NZ707dBaDmGzG1JLDJ6pkIAJRTR2IyLo2DG2aUYW4EtV_MuwtQm4ln-sniC_6tuHZbcX4rlrDIpahDsaRS7VEXy1ikc1CNXs8o7-Gi06MybUc7pAg-OPPBgdZw3E9biM2J7NYC7cEf1e23eHbroN-lQq6BWNTOAoIB3er2at3rCNl4fWcDIpcA/s320/1000260589.png" style="width: 2.5rem; height: 3.5rem; margin-right: 15px;" alt="Logo"> Release Media</h2>
+                <p>Delivering premium, globally recognized journalism engineered with award-winning design and uncompromised integrity. Founded in the pursuit of absolute truth.</p>
+                
+                <div class="footer-socials" style="margin-top: 30px;">
+                    <a href="#" class="interactable"><i class="ph-fill ph-twitter-logo"></i></a>
+                    <a href="#" class="interactable"><i class="ph-fill ph-linkedin-logo"></i></a>
+                    <a href="#" class="interactable"><i class="ph-fill ph-youtube-logo"></i></a>
+                    <a href="#" class="interactable"><i class="ph-fill ph-instagram-logo"></i></a>
+                </div>
             </div>
             
             <div class="footer-links reveal" style="transition-delay: 0.1s;">
@@ -1350,7 +1539,7 @@
                     <li><a href="#" class="interactable">Technology Release</a></li>
                     <li><a href="#" class="interactable">Political Release</a></li>
                     <li><a href="#" class="interactable">Sports Release</a></li>
-                    <li><a href="#" class="interactable">World Release</a></li>
+                    <li><a href="#" class="interactable">Auto Release</a></li>
                 </ul>
             </div>
             
@@ -1361,23 +1550,33 @@
                     <li><a href="#" class="interactable">Careers</a></li>
                     <li><a href="#" class="interactable">Editorial Standards</a></li>
                     <li><a href="#" class="interactable">Press Room</a></li>
-                    <li><a href="#" class="interactable">Contact</a></li>
+                    <li><a href="#" class="interactable">Contact Desk</a></li>
                 </ul>
             </div>
             
             <div class="footer-links reveal" style="transition-delay: 0.3s;">
-                <h3>Legal & Privacy</h3>
-                <ul>
-                    <li><a href="#" class="interactable">Terms of Service</a></li>
-                    <li><a href="#" class="interactable">Privacy Policy</a></li>
-                    <li><a href="#" class="interactable">Cookie Settings</a></li>
-                    <li><a href="#" class="interactable">Accessibility Statement</a></li>
-                </ul>
+                <h3>Stay Updated</h3>
+                <div class="footer-newsletter">
+                    <p>Get the most vital stories delivered directly to your inbox every morning.</p>
+                    <form class="fn-form interactable" onsubmit="event.preventDefault(); alert('Subscribed to Morning Briefing!');">
+                        <input type="email" placeholder="Your email address..." required>
+                        <button type="submit"><i class="ph-bold ph-arrow-right"></i></button>
+                    </form>
+                </div>
+                
+                <div style="margin-top: 35px;">
+                    <h3 style="margin-bottom: 15px; font-size: 1.1rem; border: none;">Legal</h3>
+                    <ul style="display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.9rem;">
+                        <li><a href="#" class="interactable" style="font-size: 0.9rem;">Privacy</a></li>
+                        <li><a href="#" class="interactable" style="font-size: 0.9rem;">Terms</a></li>
+                        <li><a href="#" class="interactable" style="font-size: 0.9rem;">Cookies</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
         
         <div class="footer-bottom">
-            <div>&copy; 2026 Release Media Network. All rights reserved. Designed with precision.</div>
+            <div>&copy; 2026 Release Media Network. All rights reserved. Designed with precision in India.</div>
             <button id="back-to-top" class="icon-btn interactable" style="background: rgba(255,255,255,0.1); color:white; border-color: rgba(255,255,255,0.2);">
                 <i class="ph-bold ph-caret-up"></i>
             </button>
@@ -1434,7 +1633,7 @@
                 setTimeout(() => {
                     preloader.style.opacity = '0';
                     setTimeout(() => preloader.style.display = 'none', 800);
-                }, 2500); // Cinematic delay
+                }, 100); // Cinematic delay removed for super fast loading
             });
 
             /* ==========================================================================
@@ -1499,35 +1698,36 @@
             searchClose.addEventListener('click', () => searchOverlay.classList.remove('active'));
 
             /* ==========================================================================
-               6. HERO SLIDER & TYPING ANIMATION
+               6. HERO SLIDER ANIMATION
                ========================================================================== */
-            const typeText = document.getElementById('type-text');
-            const words = ["Quantum Global Networks", "Sustainable AI Grids", "Next-Gen Biotechnology"];
-            let wordIndex = 0; let charIndex = 0; let isDeleting = false;
+            const slides = document.querySelectorAll('.hero-slider .slide');
+            const dots = document.querySelectorAll('.hero-nav .dot');
+            let currentSlide = 0;
+            let slideInterval;
 
-            function typeEffect() {
-                const currentWord = words[wordIndex];
-                if (isDeleting) {
-                    typeText.textContent = currentWord.substring(0, charIndex - 1);
-                    charIndex--;
-                } else {
-                    typeText.textContent = currentWord.substring(0, charIndex + 1);
-                    charIndex++;
-                }
-
-                let speed = isDeleting ? 50 : 100;
-                
-                if (!isDeleting && charIndex === currentWord.length) {
-                    speed = 2000; // Pause at end
-                    isDeleting = true;
-                } else if (isDeleting && charIndex === 0) {
-                    isDeleting = false;
-                    wordIndex = (wordIndex + 1) % words.length;
-                    speed = 500; // Pause before new word
-                }
-                setTimeout(typeEffect, speed);
+            function goToSlide(n) {
+                slides[currentSlide].classList.remove('active');
+                dots[currentSlide].classList.remove('active');
+                currentSlide = (n + slides.length) % slides.length;
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
             }
-            setTimeout(typeEffect, 3000); // Start after preloader
+
+            function nextSlide() {
+                goToSlide(currentSlide + 1);
+            }
+
+            // Start auto slide (every 5 seconds)
+            slideInterval = setInterval(nextSlide, 5000);
+
+            // Add click events to dots for manual navigation
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    clearInterval(slideInterval); // Stop auto-sliding on manual interaction
+                    goToSlide(index);
+                    slideInterval = setInterval(nextSlide, 5000); // Restart auto-sliding
+                });
+            });
 
             /* ==========================================================================
                7. DRAG TO SCROLL (CAROUSELS)
@@ -1556,6 +1756,7 @@
 
             setupDragScroll('trending-track');
             setupDragScroll('latest-track');
+            setupDragScroll('podcast-track');
 
             /* ==========================================================================
                8. SCROLL REVEAL (INTERSECTION OBSERVER)
