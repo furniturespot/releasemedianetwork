@@ -7,9 +7,8 @@
     <meta name="description" content="Award-winning global news, business, technology, sports, and political updates.">
     
     <!-- ==========================================================================
-         CRITICAL PERFORMANCE UPDATE: EARLY DATA FETCHING
-         This script executes immediately as the browser reads the head, starting the
-         API requests to all Google Sheets concurrently BEFORE the DOM or CSS loads.
+         CRITICAL PERFORMANCE UPDATE: EARLY DATA FETCHING & RETRY LOGIC
+         Restored original endpoints but kept the 5-second preloader lock.
          ========================================================================== -->
     <script>
         window.globalState = { news: [], podcasts: [], videos: [], photos: [], sponsors: [] };
@@ -134,7 +133,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* NOTE: Using overflow-x: clip instead of hidden to allow position: sticky to work */
         html { scroll-behavior: smooth; max-width: 100%; overflow-x: clip; }
         
         body {
@@ -171,7 +169,6 @@
 
         #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--accent-red), var(--cat-release)); width: 0%; z-index: 100000; box-shadow: var(--glow-shadow); }
 
-        /* Disable Custom Cursor on Touch Devices */
         @media (pointer: coarse), (max-width: 1024px) {
             body, button, input, a, .interactable { cursor: auto !important; }
             .cursor-dot, .cursor-outline { display: none !important; }
@@ -183,13 +180,77 @@
         #preloader {
             position: fixed; inset: 0; background: var(--bg-primary); z-index: 999990;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s var(--ease-out-expo), visibility 0.8s; overflow: hidden;
+            transition: opacity 0.8s var(--ease-out-expo), visibility 0.8s, transform 0.8s var(--ease-out-expo); overflow: hidden;
         }
-        .pl-globe { font-size: clamp(4rem, 10vw, 8rem); color: var(--cat-release); animation: spinGlobe 4s linear infinite; margin-bottom: 20px;}
-        .pl-title { font-size: clamp(2rem, 8vw, 4rem); font-weight: 900; background: linear-gradient(45deg, var(--accent-red), #ff5555); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; animation: pulse 2s infinite; text-align: center; padding: 0 10px;}
-        .pl-bar-wrap { width: clamp(200px, 80vw, 400px); height: 6px; background: var(--border-color); border-radius: 6px; overflow: hidden; position: relative; margin-top:20px;}
-        .pl-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent-red); width: 0%; box-shadow: 0 0 10px var(--accent-red); animation: fillBar 3s var(--ease-out-expo) forwards; } 
-        .pl-flying-news { position: absolute; font-size: 2rem; color: var(--text-secondary); opacity: 0.2; animation: flyNews 3s linear infinite; }
+        .pl-bg-glow {
+            position: absolute; width: 60vw; height: 60vw; border-radius: 50%;
+            background: radial-gradient(circle, rgba(225, 6, 0, 0.05) 0%, transparent 70%);
+            animation: pulseBg 4s infinite alternate; pointer-events: none;
+        }
+        .pl-logo-wrap {
+            position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;
+            width: clamp(6.5rem, 16vw, 11rem); height: clamp(6.5rem, 16vw, 11rem);
+        }
+        .pl-ring {
+            position: absolute; width: 100%; height: 100%; border: 2px dashed var(--cat-release);
+            border-radius: 50%; animation: spinGlobeReverse 8s linear infinite; opacity: 0.4;
+        }
+        .pl-globe { 
+            font-size: clamp(4rem, 10vw, 7rem); color: var(--cat-release); 
+            animation: spinGlobe 4s linear infinite, glowGlobe 2s ease-in-out infinite alternate; 
+            filter: drop-shadow(0 0 15px rgba(255, 193, 7, 0.4));
+        }
+        .pl-logo-img {
+            width: 65%; height: 65%; object-fit: contain; object-position: center;
+            animation: float 4s ease-in-out infinite, glowGlobe 2.5s ease-in-out infinite alternate;
+            position: relative; z-index: 2;
+        }
+        .pl-title { 
+            font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 900; margin-bottom: 10px; text-align: center; padding: 0 10px;
+            display: flex; flex-wrap: wrap; justify-content: center;
+        }
+        .pl-letter {
+            background: linear-gradient(45deg, var(--accent-red), #ff5555);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: 0; transform: translateY(20px) scale(0.8);
+            animation: popLetter 0.6s var(--ease-out-expo) forwards;
+            display: inline-block; filter: drop-shadow(0 5px 15px rgba(225, 6, 0, 0.2));
+        }
+        .pl-subtitle {
+            font-family: var(--font-accent); letter-spacing: 6px; color: var(--text-secondary); 
+            font-weight: 700; text-align: center; font-size: clamp(0.7rem, 2vw, 1rem);
+            opacity: 0; animation: fadeInSub 1s ease forwards 0.8s;
+        }
+        .pl-bar-wrap { 
+            width: clamp(200px, 60vw, 350px); height: 4px; background: rgba(150,150,150,0.15); 
+            border-radius: 4px; overflow: hidden; position: relative; margin-top: 30px;
+            opacity: 0; animation: fadeInSub 1s ease forwards 0.8s;
+        }
+        .pl-bar { 
+            position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--accent-red), var(--cat-release)); 
+            width: 0%; box-shadow: 0 0 15px var(--accent-red); animation: fillBar 3s var(--ease-out-expo) forwards 1s; 
+        } 
+        .pl-bar-glow {
+            position: absolute; top: 0; right: 0; bottom: 0; width: 30px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+            animation: slideGlow 1.5s linear infinite;
+        }
+        .pl-flying-news { 
+            position: absolute; color: var(--text-secondary); opacity: 0; 
+            animation: flyNews3D 4s ease-in-out infinite; 
+        }
+
+        @keyframes popLetter { to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeInSub { to { opacity: 1; } }
+        @keyframes spinGlobeReverse { to { transform: rotate(-360deg); } }
+        @keyframes glowGlobe { from { filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.2)) scale(1); } to { filter: drop-shadow(0 0 30px rgba(255, 193, 7, 0.8)) scale(1.05); } }
+        @keyframes pulseBg { from { transform: scale(0.8); opacity: 0.4; } to { transform: scale(1.2); opacity: 0.8; } }
+        @keyframes slideGlow { 0% { transform: translateX(-150%); } 100% { transform: translateX(300%); } }
+        @keyframes flyNews3D {
+            0% { transform: translate(-60px, 60px) rotate(-20deg) scale(0.7); opacity: 0; filter: blur(3px); }
+            50% { opacity: 0.15; filter: blur(1px); }
+            100% { transform: translate(80px, -80px) rotate(20deg) scale(1.3); opacity: 0; filter: blur(3px); }
+        }
 
         /* ==========================================================================
            4. NAVIGATION (Mega Menu & Live Bar)
@@ -212,7 +273,6 @@
         .ticker-item { cursor: pointer; font-weight: 600; transition: color 0.3s; }
         .ticker-item:hover { color: var(--cat-release); text-decoration: underline; }
 
-        /* Ensure header is fixed and full width */
         header { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: var(--bg-primary); transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s, padding 0.4s; width: 100%; max-width: 100%; box-sizing: border-box; }
         header.scrolled {
             background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -377,14 +437,14 @@
         /* ==========================================================================
            8. PREMIUM NEWS CARDS
            ========================================================================== */
-        .news-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(16px, 4vw, 35px); margin-bottom: clamp(40px, 8vw, 70px); position: relative;}
+        .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 25px); margin-bottom: clamp(40px, 8vw, 70px); position: relative;}
         
         .news-card {
             background: var(--bg-primary); border-radius: 24px; 
             border: 1px solid var(--gold-border);
             overflow: hidden; box-shadow: var(--gold-shadow); display: flex; flex-direction: column;
             position: relative; transform-style: preserve-3d; transition: all 0.4s; cursor: pointer;
-            width: 100%; /* Ensure full width in grids */
+            width: 100%;
         }
         @media (hover: hover) and (pointer: fine) {
             .news-card::before {
@@ -428,7 +488,7 @@
             .main-layout { align-items: flex-start; }
             .sidebar {
                 position: sticky;
-                top: 180px; /* Offset to clear the fixed header */
+                top: 180px; 
                 height: max-content;
                 align-self: flex-start;
                 z-index: 10;
@@ -701,27 +761,21 @@
             .mobile-view-more-wrap {
                 display: none !important;
             }
-            /* Add padding to body to compensate for fixed header on desktop */
             body { padding-top: 155px; } 
         }
         
         /* DESKTOP ONLY: Specific adjustments */
         @media (min-width: 900px) {
-            /* Precise width math to prevent the 'little scrollable' bug */
             .trending-track { gap: 20px; }
             .trend-card { width: calc(25% - 15px); min-width: unset; max-width: none; }
             
             .latest-track { gap: 24px; }
             .latest-track .news-card { width: calc(25% - 18px); min-width: unset; max-width: none; }
 
-            #business .news-grid .news-card {
-                /* Keeping standard fluid height */
-            }
             #business .news-card .nc-img-wrap {
                 height: 320px; 
             }
             
-            /* Decrease header size by 30% on desktop only */
             .live-bar { padding: 5px 20px; font-size: 0.75rem; }
             .live-badge { padding: 3px 12px; font-size: 0.7rem; }
             .nav-main { padding: 14px 40px; }
@@ -735,7 +789,6 @@
             header.scrolled .logo img, header.scrolled .logo i { width: 2.5rem; height: 2.5rem; font-size: 2.5rem; }
             header.scrolled .icon-btn { width: 28px; height: 28px; font-size: 1rem; }
 
-            /* Fix Hero Slider Content Alignment & Top Gap */
             .hero-slider {
                 height: clamp(550px, 85svh, 90vh); 
                 min-height: 550px;
@@ -753,7 +806,6 @@
 
         /* TABLET & SMALL DESKTOP (1400px and below) */
         @media (min-width: 1401px) {
-            /* Larger exact widths for ultra-wide */
             .trending-track { gap: 30px; }
             .trend-card { width: calc(25% - 22.5px); }
             
@@ -785,7 +837,6 @@
             }
             header.scrolled .nav-main { padding: 10px 16px; }
             
-            /* Compact mobile header on scroll & Inside Modals */
             header.scrolled .nav-actions,
             header.scrolled .nav-cats-wrap,
             .cfm-header .nav-actions,
@@ -910,10 +961,8 @@
                 margin-bottom: 15px;
             }
             
-            /* Fix broken clock stack on cloned mobile modal headers */
             #live-clock, .live-clock-display { display: none !important; }
 
-            /* Fix Sponsor Box Flex Wraps on Mobile */
             .widget.ad-widget { 
                 padding: 30px 20px !important; 
                 flex-direction: column !important;
@@ -949,7 +998,6 @@
             #live-clock { display: none; } 
             .ticker-item { font-size: 0.85rem; }
             
-            /* Adjust top padding for body to clear the tall fixed mobile header */
             body { padding-top: 220px; } 
 
             .main-layout { padding: 0 16px; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden; display: flex; flex-direction: column; }
@@ -974,7 +1022,7 @@
                 display: flex !important; 
                 justify-content: center;
                 width: 100%;
-                margin: 20px auto 30px auto; /* Added 30px bottom margin to create a gap before the sponsor box */
+                margin: 20px auto 30px auto; 
                 padding: 0 16px;
                 box-sizing: border-box;
             }
@@ -1037,7 +1085,7 @@
             .footer-socials { justify-content: center; }
             .footer-links h3::after { left: 50%; transform: translateX(-50%); }
             .footer-links ul li a { justify-content: center; }
-            #legal-links { justify-content: center !important; } /* Added this line to center legal links on mobile */
+            #legal-links { justify-content: center !important; }
             .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
             
             .masonry-grid { grid-template-columns: 1fr; gap: 15px;}
@@ -1075,14 +1123,45 @@
 
     <!-- Preloader -->
     <div id="preloader">
-        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:20%; left:10%; animation-delay: 0s;"></i>
-        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:60%; left:30%; animation-delay: 1s; font-size: 4rem;"></i>
-        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:30%; right:20%; animation-delay: 2s; font-size: 3rem;"></i>
+        <div class="pl-bg-glow"></div>
         
-        <i class="ph-duotone ph-globe-hemisphere-east pl-globe"></i>
-        <h1 class="pl-title">Release Network</h1>
-        <div style="font-family: var(--font-accent); letter-spacing: 4px; color: var(--text-secondary); font-weight: 700; text-align: center; font-size: clamp(0.7rem, 2vw, 1rem);">INITIALIZING THE TRUTH</div>
-        <div class="pl-bar-wrap"><div class="pl-bar"></div></div>
+        <i class="ph-duotone ph-newspaper pl-flying-news" style="top:15%; left:12%; animation-delay: 0s; font-size: 3rem;"></i>
+        <i class="ph-duotone ph-article pl-flying-news" style="top:70%; left:25%; animation-delay: 1.5s; font-size: 4rem;"></i>
+        <i class="ph-duotone ph-broadcast pl-flying-news" style="top:25%; right:15%; animation-delay: 0.5s; font-size: 3.5rem;"></i>
+        <i class="ph-duotone ph-globe pl-flying-news" style="top:75%; right:22%; animation-delay: 2.2s; font-size: 2.5rem;"></i>
+        
+        <!-- More background elements (news/books) -->
+        <i class="ph-duotone ph-book-open pl-flying-news" style="top:10%; right:35%; animation-delay: 1.2s; font-size: 3rem;"></i>
+        <i class="ph-duotone ph-books pl-flying-news" style="top:40%; left:8%; animation-delay: 2.8s; font-size: 2.8rem;"></i>
+        <i class="ph-duotone ph-file-text pl-flying-news" style="top:85%; left:15%; animation-delay: 0.8s; font-size: 3.2rem;"></i>
+        <i class="ph-duotone ph-notebook pl-flying-news" style="top:55%; right:8%; animation-delay: 3.1s; font-size: 3.8rem;"></i>
+        <i class="ph-duotone ph-bookmark-simple pl-flying-news" style="top:85%; right:40%; animation-delay: 1.9s; font-size: 2.2rem;"></i>
+        <i class="ph-duotone ph-book-bookmark pl-flying-news" style="top:30%; left:35%; animation-delay: 0.3s; font-size: 2.5rem;"></i>
+        
+        <div class="pl-logo-wrap">
+            <div class="pl-ring"></div>
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhtV3RDIYtcXHJW0_mjWEaMdBUBVtBpcIefa_-HuflZ_E6u0-lf19qJdfparqE8yQWJtirr0XmHgOt9lRfIsF4voNn3V9Mv1rqV2UxrV1S-aDFfBdl6lmhXgTqGIR6tthVu4y2DQ2aeGaMfYZmZEBHfn92LBeLdPA9P2Dojoc6G19gHS1m7ChtIJ5gNwlA/s1803/1000329385.png" class="pl-logo-img" alt="Release Network Logo">
+        </div>
+        
+        <h1 class="pl-title">
+            <span class="pl-letter" style="animation-delay: 0.05s;">R</span>
+            <span class="pl-letter" style="animation-delay: 0.10s;">e</span>
+            <span class="pl-letter" style="animation-delay: 0.15s;">l</span>
+            <span class="pl-letter" style="animation-delay: 0.20s;">e</span>
+            <span class="pl-letter" style="animation-delay: 0.25s;">a</span>
+            <span class="pl-letter" style="animation-delay: 0.30s;">s</span>
+            <span class="pl-letter" style="animation-delay: 0.35s;">e</span>
+            &nbsp;
+            <span class="pl-letter" style="animation-delay: 0.45s;">N</span>
+            <span class="pl-letter" style="animation-delay: 0.50s;">e</span>
+            <span class="pl-letter" style="animation-delay: 0.55s;">t</span>
+            <span class="pl-letter" style="animation-delay: 0.60s;">w</span>
+            <span class="pl-letter" style="animation-delay: 0.65s;">o</span>
+            <span class="pl-letter" style="animation-delay: 0.70s;">r</span>
+            <span class="pl-letter" style="animation-delay: 0.75s;">k</span>
+        </h1>
+        <div class="pl-subtitle">INITIALIZING THE TRUTH</div>
+        <div class="pl-bar-wrap"><div class="pl-bar"><div class="pl-bar-glow"></div></div></div>
     </div>
 
     <!-- Search Popup -->
@@ -1114,12 +1193,11 @@
         
         <div class="nav-main">
             <a href="#" class="logo interactable">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiirGQNW-MbLnI1PR8IntbuKunXGQX7e6d_t-lkt7T40huxOhlJU2xVynfr1OwFi41pZxvCCi3gZF5bs4ihlgAzvexswnAc-zE_3l2mbghBI8t1Oy1QRcgjD4oPM1OFrt9bh62p8VvVTa6h-0fn1tobmTa6IR19zKFMLklyC45BzWuF2L2hJ-1X63AThS8/s1869/1000290595.png" alt="Release Network Logo">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhtV3RDIYtcXHJW0_mjWEaMdBUBVtBpcIefa_-HuflZ_E6u0-lf19qJdfparqE8yQWJtirr0XmHgOt9lRfIsF4voNn3V9Mv1rqV2UxrV1S-aDFfBdl6lmhXgTqGIR6tthVu4y2DQ2aeGaMfYZmZEBHfn92LBeLdPA9P2Dojoc6G19gHS1m7ChtIJ5gNwlA/s1803/1000329385.png" alt="Release Network Logo">
                 <div>Release <span>Network</span></div>
             </a>
             
             <div class="nav-actions">
-                <button class="lang-sel interactable">EN <i class="ph-bold ph-caret-down"></i></button>
                 <button class="icon-btn interactable search-trigger" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
                 <button class="icon-btn interactable" aria-label="Notifications"><i class="ph ph-bell-ringing"></i></button>
                 <button class="icon-btn interactable" id="theme-toggle" aria-label="Dark Mode"><i class="ph ph-moon"></i></button>
@@ -1133,12 +1211,12 @@
         <div class="nav-cats-wrap">
             <nav class="nav-cats" id="main-nav">
                 <a href="#hero-slider" class="cat-link interactable active" style="--hover-color: var(--text-primary); color: var(--text-primary);"><i class="ph-fill ph-house"></i> Home</a>
-                <a href="#business" class="cat-link interactable" style="--hover-color: var(--cat-business);"><i class="ph-duotone ph-briefcase"></i> Business</a>
-                <a href="#tech" class="cat-link interactable" style="--hover-color: var(--cat-tech);"><i class="ph-duotone ph-cpu"></i> Technology</a>
-                <a href="#sports" class="cat-link interactable" style="--hover-color: var(--cat-sports);"><i class="ph-duotone ph-person-simple-run"></i> Sports</a>
-                <a href="#politics" class="cat-link interactable" style="--hover-color: var(--cat-politics);"><i class="ph-duotone ph-bank"></i> Politics</a>
-                <a href="#style" class="cat-link interactable" style="--hover-color: var(--cat-style);"><i class="ph-duotone ph-sparkle"></i> Style</a>
-                <a href="#auto" class="cat-link interactable" style="--hover-color: var(--cat-auto);"><i class="ph-duotone ph-car-profile"></i> Auto</a>
+                <a href="#business" class="cat-link interactable" style="--hover-color: var(--cat-business);">Business</a>
+                <a href="#tech" class="cat-link interactable" style="--hover-color: var(--cat-tech);">Technology</a>
+                <a href="#sports" class="cat-link interactable" style="--hover-color: var(--cat-sports);">Sports</a>
+                <a href="#politics" class="cat-link interactable" style="--hover-color: var(--cat-politics);">Politics</a>
+                <a href="#style" class="cat-link interactable" style="--hover-color: var(--cat-style);">Style</a>
+                <a href="#auto" class="cat-link interactable" style="--hover-color: var(--cat-auto);">Auto</a>
             </nav>
         </div>
     </header>
@@ -1300,18 +1378,97 @@
             </div>
 
             <div class="widget reveal">
-                <h3 class="widget-title"><i class="ph-fill ph-share-network" style="color: var(--cat-finance);"></i> Connect With Us</h3>
-                <div class="social-grid">
-                    <a href="https://www.facebook.com/share/19XqH6pkUH/" class="sg-item sg-fb interactable"><i class="ph-fill ph-facebook-logo"></i></a>
-                    <a href="https://www.instagram.com/thereleasenetwork" class="sg-item sg-ig interactable"><i class="ph-fill ph-instagram-logo"></i></a>
-                    <a href="#" class="sg-item sg-tw interactable"><i class="ph-fill ph-twitter-logo"></i></a>
-                    <a href="https://youtube.com/@releasemedianetwork" class="sg-item sg-yt interactable"><i class="ph-fill ph-youtube-logo"></i></a>
-                    <a href="#" class="sg-item sg-in interactable"><i class="ph-fill ph-linkedin-logo"></i></a>
-                    <a href="#" class="sg-item sg-tg interactable"><i class="ph-fill ph-telegram-logo"></i></a>
-                    <a href="#" class="sg-item sg-wa interactable"><i class="ph-fill ph-whatsapp-logo"></i></a>
-                    <a href="#" class="sg-item sg-th interactable"><i class="ph-fill ph-threads-logo"></i></a>
-                </div>
-            </div>
+    <h3 class="widget-title">
+        <i class="ph-fill ph-share-network" style="color: var(--cat-finance);"></i>
+        Connect With Us
+    </h3>
+
+    <div class="social-grid">
+        <a href="https://www.facebook.com/share/19XqH6pkUH/"
+           class="sg-item sg-fb interactable"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Facebook">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_de_Facebook.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                 alt="Facebook" class="social-png-icon">
+        </a>
+
+        <a href="https://www.instagram.com/thereleasenetwork/"
+           class="sg-item sg-ig interactable"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Instagram">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                 alt="Instagram" class="social-png-icon">
+        </a>
+
+        <a href="#"
+           class="sg-item sg-tw interactable"
+           aria-label="X (Twitter)">
+            <img src="https://www.freeiconspng.com/uploads/new-x-twitter-logo-png-photo-1.png"
+                 alt="X (Twitter)" class="social-png-icon">
+        </a>
+
+        <a href="https://youtube.com/@releasemedianetwork"
+           class="sg-item sg-yt interactable"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="YouTube">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                 alt="YouTube" class="social-png-icon">
+        </a>
+
+        <a href="#"
+           class="sg-item sg-in interactable"
+           aria-label="LinkedIn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                 alt="LinkedIn" class="social-png-icon">
+        </a>
+
+        <a href="#"
+           class="sg-item sg-tg interactable"
+           aria-label="Telegram">
+            <img src="https://pngimg.com/uploads/telegram/telegram_PNG35.png"
+                 alt="Telegram" class="social-png-icon">
+        </a>
+
+        <a href="#"
+           class="sg-item sg-wa interactable"
+           aria-label="WhatsApp">
+            <img src="https://www.logo.wine/a/logo/WhatsApp/WhatsApp-White-Dark-Background-Logo.wine.svg"
+                 alt="WhatsApp" class="social-png-icon">
+        </a>
+
+        <a href="#"
+           class="sg-item sg-th interactable"
+           aria-label="Threads">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/Threads_%28app%29.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                 alt="Threads" class="social-png-icon">
+        </a>
+    </div>
+</div>
+<style>
+    /* Social media PNG logo icons */
+.social-grid .social-png-icon {
+    display: block;
+    width: 240px;
+    height: 240px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Preserve existing social button alignment */
+.social-grid .sg-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Keep icon sizing consistent on mobile */
+@media (max-width: 768px) {
+    .social-grid .social-png-icon {
+        width: 220px;
+        height: 220px;
+    }
+}
+</style>
 
         </aside>
     </div>
@@ -1346,10 +1503,18 @@
                 <p>Release Network is a Nepal-based networking and news platform connecting people, businesses, and communities through reliable information, meaningful stories, digital innovation, and professional networking opportunities.</p>
                 
                 <div class="footer-socials" style="margin-top: 20px;">
-                    <a href="https://www.facebook.com/share/19XqH6pkUH/" class="interactable"><i class="ph-fill ph-facebook-logo"></i></a>
-                    <a href="#" class="interactable"><i class="ph-fill ph-linkedin-logo"></i></a>
-                    <a href="https://www.facebook.com/share/19XqH6pkUH/" class="interactable"><i class="ph-fill ph-youtube-logo"></i></a>
-                    <a href="https://www.instagram.com/thereleasenetwork" class="interactable"><i class="ph-fill ph-instagram-logo"></i></a>
+                    <a href="https://www.facebook.com/share/19XqH6pkUH/" class="interactable" aria-label="Facebook" style="overflow: hidden; border: none; padding: 0;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_de_Facebook.png" alt="Facebook" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);">
+                    </a>
+                    <a href="#" class="interactable" aria-label="LinkedIn" style="overflow: hidden; border: none; padding: 0;">
+                        <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/LinkedIn_icon_circle.svg/3840px-LinkedIn_icon_circle.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail" alt="LinkedIn" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);">
+                    </a>
+                    <a href="https://youtube.com/@releasemedianetwork" class="interactable" aria-label="YouTube" style="overflow: hidden; border: none; padding: 0; background: white;">
+                        <img src="https://www.svgrepo.com/show/416500/youtube-circle-logo.svg" alt="YouTube" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);">
+                    </a>
+                    <a href="https://www.instagram.com/thereleasenetwork" class="interactable" aria-label="Instagram" style="overflow: hidden; border: none; padding: 0;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Instagram-Logo-Round-Color.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Instagram" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);">
+                    </a>
                 </div>
             </div>
             
@@ -1361,6 +1526,7 @@
                     <li><a href="#politics" class="interactable">Political Release</a></li>
                     <li><a href="#sports" class="interactable">Sports Release</a></li>
                     <li><a href="#auto" class="interactable">Auto Release</a></li>
+                    <li><a href="#fashion" class="interactable">Style Release</a></li>
                 </ul>
             </div>
             
@@ -1397,7 +1563,7 @@
         </div>
         
         <div class="footer-bottom">
-            <div>&copy; 2026 Release Network. All rights reserved. Release Network Pvt Ltd.</div>
+            <div>&copy; 2026 Release Network | All rights reserved | Release Network Pvt Ltd</div>
 
            <div>
     Website Developed by
@@ -1511,7 +1677,7 @@
     <!-- BULLETPROOF JAVASCRIPT DATA LAYER & ARCHITECTURE -->
     <script>
         // ----------------------------------------------------------------------
-        // CRITICAL FAILSAFE: Guarantee Preloader Removal
+        // FAILSAFE PRELOADER HIDE FUNCTION (The Hardcoded 3.5s limit has been removed)
         // ----------------------------------------------------------------------
         const hidePreloader = () => {
             const pl = document.getElementById('preloader');
@@ -1520,9 +1686,6 @@
                 setTimeout(() => pl.style.display = 'none', 800);
             }
         };
-        
-        // FAILSAFE: Always remove preloader after 3.5 seconds, even if APIs fail or are slow
-        const preloaderTimeout = setTimeout(hidePreloader, 3500);
 
         document.addEventListener('DOMContentLoaded', () => {
             const globalState = window.globalState;
@@ -1531,7 +1694,6 @@
                DYNAMIC ANIMATION BINDER
                ========================================================================== */
             const bindDynamicAnimations = () => {
-                // Premium 3D Tilt Effect - Skip on coarse pointers
                 if (window.matchMedia("(pointer: fine)").matches) {
                     document.querySelectorAll('.tilt-element:not([data-tilt-bound])').forEach(el => {
                         el.dataset.tiltBound = 'true';
@@ -1547,7 +1709,6 @@
                         });
                     });
 
-                    // Magnetic Buttons
                     document.querySelectorAll('.magnetic-wrap:not([data-mag-bound])').forEach(wrap => {
                         wrap.dataset.magBound = 'true';
                         const btn = wrap.querySelector('button, a');
@@ -1562,7 +1723,6 @@
                     });
                 }
 
-                // Ripple Click Effect
                 document.querySelectorAll('.ripple-wrap:not([data-rip-bound])').forEach(btn => {
                     btn.dataset.ripBound = 'true';
                     btn.addEventListener('click', function(e) {
@@ -1697,7 +1857,6 @@
             document.getElementById('cfm-header').querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
             document.getElementById('cfm-footer').querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
 
-            // Handle device back button for ALL modals
             window.addEventListener('popstate', () => {
                 if (catFullModal && catFullModal.classList.contains('active')) {
                     catFullModal.classList.remove('active');
@@ -1736,12 +1895,9 @@
 'careers': {
     title: 'Careers',
     content: `
-
-
         <h3 style="margin-bottom: 15px;">
             Build Your Future. Tell Stories That Matter.
         </h3>
-
         <p style="margin-bottom: 15px;">
             At Release Network, we believe great ideas come from passionate
             people who are curious about the world and committed to making
@@ -1749,7 +1905,6 @@
             platform in Nepal, and we welcome creative minds who want to
             contribute to the future of digital media and communication.
         </p>
-
         <p style="margin-bottom: 15px;">
             Whether your interests lie in journalism, content writing,
             digital marketing, photography, videography, graphic design,
@@ -1757,7 +1912,6 @@
             Release Network offers an environment where creativity,
             collaboration, and innovation can thrive.
         </p>
-
         <p style="margin-bottom: 15px;">
             We value individuals who are eager to learn, communicate
             effectively, explore new ideas, and work responsibly. Our goal
@@ -1765,20 +1919,17 @@
             skills, share their perspectives, and contribute to content
             and services that connect communities and inform audiences.
         </p>
-
         <p style="margin-bottom: 15px;">
             We are also interested in connecting with freelancers,
             contributors, interns, and media professionals who share
             our vision.
         </p>
-
         <p style="margin-bottom: 15px;">
             If you are passionate about storytelling, digital innovation,
             networking, or the media industry, we would love to hear from
             you. Send us your resume, portfolio, or a brief introduction
             explaining how you can contribute to our platform.
         </p>
-
         <p style="margin-bottom: 15px;">
             <strong>
                 Join Release Network and help shape the next chapter
@@ -1791,33 +1942,25 @@
 'editorial': {
     title: 'Editorial Standards',
     content: `
-
         <h3 style="margin-bottom: 15px;">Accuracy. Integrity. Accountability.</h3>
-
         <p style="margin-bottom: 15px;">
             Release Network is committed to publishing informative, responsible, and relevant content for our readers. Our editorial standards are designed to promote accuracy, fairness, transparency, and respect across the news and information we share.
         </p>
-
         <p style="margin-bottom: 15px;">
             We aim to verify information before publication, use credible sources whenever possible, and distinguish factual reporting from commentary, opinion, and promotional material. Our editorial team strives to present news clearly, provide appropriate context, and avoid misleading headlines, manipulated information, or unsupported claims.
         </p>
-
         <p style="margin-bottom: 15px;">
             We respect the privacy, dignity, and rights of individuals and communities. Sensitive topics are approached with care, and allegations involving individuals or organizations should be handled responsibly and supported by reliable information.
         </p>
-
         <p style="margin-bottom: 15px;">
             Release Network also recognizes the importance of transparency in digital media. Sponsored articles, paid promotions, advertisements, and other commercial content should be identified appropriately so readers can distinguish them from independent editorial coverage.
         </p>
-
         <p style="margin-bottom: 15px;">
             If an article contains a factual error, readers are encouraged to contact our editorial team with the relevant details. We will review credible correction requests and make appropriate updates when necessary.
         </p>
-
         <p style="margin-bottom: 15px;">
             We believe trust is earned through consistent effort, responsible communication, and a willingness to be accountable. Our editorial standards serve as a guiding framework for producing content that informs audiences and supports meaningful public discussion.
         </p>
-
         <p style="margin-bottom: 15px;">
             <strong>Our commitment is simple: inform responsibly, communicate honestly, and respect our readers.</strong>
         </p>
@@ -1827,24 +1970,20 @@
 'press': {
     title: 'Press Room',
     content: `
-
         <h3 style="margin-bottom: 15px;">
             The Latest Updates, Announcements, and Media Resources.
         </h3>
-
         <p style="margin-bottom: 15px;">
             Welcome to the Release Network Press Room, your central destination
             for official announcements, company updates, media information, and
             developments related to our platform.
         </p>
-
         <p style="margin-bottom: 15px;">
             As a Nepal-based networking and news platform, Release Network is
             focused on expanding digital communication, sharing relevant stories,
             and creating opportunities for businesses, professionals, and
             communities to connect with wider audiences.
         </p>
-
         <p style="margin-bottom: 15px;">
             Our Press Room is designed to help journalists, media organizations,
             business partners, advertisers, and other interested stakeholders
@@ -1853,14 +1992,12 @@
             organizational announcements, partnership updates, media statements,
             and information about upcoming campaigns or projects.
         </p>
-
         <p style="margin-bottom: 15px;">
             We welcome opportunities to collaborate with media professionals,
             participate in meaningful industry conversations, and establish
             partnerships that contribute to the growth of Nepal's digital
             media landscape.
         </p>
-
         <p style="margin-bottom: 15px;">
             For press inquiries, interview requests, official statements,
             partnership announcements, or media-related assistance, please
@@ -1868,11 +2005,9 @@
             submitting a request, include your name, organization, contact
             information, and a brief description of your inquiry.
         </p>
-
         <p style="margin-bottom: 15px;">
             Our team will review media requests and respond as appropriate.
         </p>
-
         <p style="margin-bottom: 0;">
             <strong>
                 For official information and media inquiries, connect with
@@ -1885,22 +2020,13 @@
 'privacy': {
     title: 'Privacy Policy',
     content: `
-
-
         <p style="margin-bottom: 15px;">Release Network is a Nepal-based news and networking platform committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect information when you access our website, read news articles, subscribe to newsletters, watch premium videos, browse sponsored content, or interact with our platform.</p>
-
         <p style="margin-bottom: 15px;"><strong>Information We Collect:</strong> We may collect information you voluntarily provide, such as your name, email address, and newsletter subscription details. We may also collect technical information, including your IP address, browser type, device information, pages visited, and usage data through cookies and similar technologies.</p>
-
         <p style="margin-bottom: 15px;"><strong>How We Use Your Information:</strong> We use collected information to operate and improve our website, personalize your experience, deliver newsletters, analyze audience engagement, maintain security, respond to inquiries, and display relevant advertising where applicable.</p>
-
         <p style="margin-bottom: 15px;"><strong>Cookies and Third Parties:</strong> Our website may use cookies, analytics services, embedded social media content, and advertising tools. These third parties may collect information according to their own privacy policies.</p>
-
         <p style="margin-bottom: 15px;"><strong>Data Sharing and Security:</strong> We do not sell personal information to third-party data brokers. We may share information with service providers when necessary to operate our platform or when legally required. We take reasonable measures to protect information, although no online system can guarantee absolute security.</p>
-
         <p style="margin-bottom: 15px;"><strong>Your Rights:</strong> You may request access to, correction of, or deletion of your personal information, subject to applicable law. You may also unsubscribe from newsletters using the unsubscribe instructions provided.</p>
-
         <p style="margin-bottom: 15px;"><strong>Policy Updates:</strong> We may update this policy periodically and publish changes on this page.</p>
-
         <p>For privacy-related questions or requests, contact us at <strong>info@releasenetwork.com</strong>.</p>
     `
 },
@@ -1908,23 +2034,14 @@
 'terms': {
     title: 'Terms of Service',
     content: `
-
         <p style="margin-bottom: 15px;">Welcome to Release Network, a Nepal-based news and networking platform. By accessing or using our website, you agree to these Terms of Service. If you do not agree with these terms, please discontinue using the platform.</p>
-
         <p style="margin-bottom: 15px;"><strong>Platform Content:</strong> Release Network publishes news articles, business updates, technology stories, political coverage, sports news, fashion and automobile updates, podcasts, premium videos, photographs, and sponsored content. Content is provided for general informational purposes and may be updated or corrected when necessary.</p>
-
         <p style="margin-bottom: 15px;"><strong>Intellectual Property:</strong> Unless otherwise stated, content created and published by Release Network, including articles, graphics, videos, logos, and website design, is protected by applicable intellectual property laws. You may not reproduce, redistribute, modify, commercially exploit, or systematically scrape protected content without prior authorization. Third-party materials remain the property of their respective owners.</p>
-
         <p style="margin-bottom: 15px;"><strong>Acceptable Use:</strong> You agree not to use our platform for unlawful activities, distribute harmful material, interfere with website security, misrepresent your identity, or attempt unauthorized access to our systems.</p>
-
         <p style="margin-bottom: 15px;"><strong>Advertising and External Links:</strong> Our platform may contain sponsored articles, advertisements, embedded media, and links to third-party websites. Sponsored content should not automatically be interpreted as an independent editorial endorsement. We are not responsible for external websites, their content, or their privacy practices.</p>
-
         <p style="margin-bottom: 15px;"><strong>Disclaimer and Liability:</strong> We strive to provide accurate and timely information but do not guarantee that all content is complete, current, or error-free. To the extent permitted by applicable law, Release Network is not liable for losses arising from reliance on website content or temporary service interruptions.</p>
-
         <p style="margin-bottom: 15px;"><strong>Suspension and Changes:</strong> We may restrict or terminate access for violations of these terms. We may also update these terms periodically, with revisions published on this page.</p>
-
         <p style="margin-bottom: 15px;"><strong>Governing Law:</strong> These terms are subject to the applicable laws of Nepal, without excluding any mandatory legal protections that apply to users.</p>
-
         <p>For questions about these Terms of Service, contact us at <strong>info@releasenetwork.com</strong>.</p>
     `
 },
@@ -1932,19 +2049,12 @@
 'cookies': {
     title: 'Cookie Policy',
     content: `
-
         <p style="margin-bottom: 15px;">Release Network is a Nepal-based news and networking platform that uses cookies and similar technologies to improve website functionality, enhance security, understand audience engagement, and provide a better browsing experience. This Cookie Policy explains how these technologies work and how you can manage your preferences.</p>
-
         <p style="margin-bottom: 15px;"><strong>What Are Cookies?</strong> Cookies are small text files stored on your device when you visit a website. They help websites remember certain information, maintain preferences, and understand how visitors interact with online content.</p>
-
         <p style="margin-bottom: 15px;"><strong>Types of Cookies We May Use:</strong> Essential cookies support core website functions, security, and navigation. Performance and analytics cookies help us understand traffic, popular articles, and website performance. Preference cookies may remember your settings. Advertising cookies, where enabled, may help measure advertising effectiveness or deliver relevant promotions.</p>
-
         <p style="margin-bottom: 15px;"><strong>Third-Party Cookies:</strong> Our website may include embedded videos, social media content, analytics services, or advertising tools provided by third parties. These services may use their own cookies and process information according to their respective privacy policies.</p>
-
         <p style="margin-bottom: 15px;"><strong>Managing Your Preferences:</strong> You can review, restrict, or delete cookies through your browser settings. Disabling certain cookies may affect website functionality. Where required by applicable law, we will request consent before using non-essential cookies.</p>
-
         <p style="margin-bottom: 15px;"><strong>Policy Updates:</strong> We may revise this Cookie Policy to reflect changes in our website, technologies, or legal requirements. Updates will be published on this page.</p>
-
         <p>For questions about cookies or your privacy preferences, contact us at <strong>info@releasenetwork.com</strong>.</p>
     `
 }
@@ -2195,10 +2305,10 @@
             };
 
             const bindHoverGlobals = setupInteractions();
-            bindDynamicAnimations(); // Initial bind for static elements
+            bindDynamicAnimations(); 
 
             /* ==========================================================================
-               3. DATA FETCHING (Now simply waiting for early promises)
+               3. DATA FETCHING UTIL & ORCHESTRATION 
                ========================================================================== */
             const parseBoolean = (val) => {
                 if(!val) return false;
@@ -2216,11 +2326,6 @@
                 return views;
             };
 
-            /* ==========================================================================
-               GOOGLE DRIVE IMAGE URL NORMALIZER
-               Supports public Drive share links and preserves normal image URLs.
-               Drive files must be shared as "Anyone with the link – Viewer".
-               ========================================================================== */
             const getImageUrl = (value, size = 1600) => {
                 if (value === null || value === undefined) return '';
                 let url = String(value).trim();
@@ -2356,30 +2461,26 @@
                 const latestContainer = document.getElementById('dynamic-latest-track');
                 if (latestContainer) {
                     if (globalState.news.length === 0) {
-                         latestContainer.innerHTML = `<div style="padding: 40px; background: #ffebee; color: #c62828; border-radius: 20px; width: 100%; border: 2px solid #ef5350;"><strong>Connection Notice:</strong> Validating database connection...</div>`;
+                         latestContainer.innerHTML = `<div style="padding: 40px; background: #ffebee; color: #c62828; border-radius: 20px; width: 100%; border: 2px solid #ef5350;"><strong>Connection Notice:</strong> Check Google Apps Script configuration. Database is empty.</div>`;
                     } else {
                         const latest = [...globalState.news].sort((a,b) => new Date(b.publishing_date||0) - new Date(a.publishing_date||0)).slice(0, 8);
                         latestContainer.innerHTML = latest.map(l => createNewsCard(l)).join('');
                     }
                 }
 
-                /* * FIX IMPLEMENTED: Correctly mapping the "Technology" category loop string 
-                 * to the actual HTML IDs used in the markup ("dynamic-tech-grid" & "tech")
-                 */
                 ['Business', 'Technology', 'Sports', 'Politics', 'Fashion', 'Auto'].forEach(cat => {
                     let sectionId = cat.toLowerCase();
                     if (cat === 'Fashion') sectionId = 'style';
-                    if (cat === 'Technology') sectionId = 'tech'; // Fixed variable mapping
+                    if (cat === 'Technology') sectionId = 'tech'; 
 
                     const gridId = `dynamic-${sectionId}-grid`;
                     const grid = document.getElementById(gridId);
                     const section = document.getElementById(sectionId);
                     
                     if(grid && section) {
-                        const data = globalState.news.filter(n => n.category === cat).sort((a,b) => new Date(b.publishing_date||0) - new Date(a.publishing_date||0)).slice(0,4);
+                        const data = globalState.news.filter(n => n.category === cat).sort((a,b) => new Date(b.publishing_date||0) - new Date(a.publishing_date||0)).slice(0,6);
                         grid.innerHTML = data.length > 0 ? data.map(d => createNewsCard(d)).join('') : '<div class="empty-state" style="grid-column: 1/-1;">No articles available.</div>';
                         
-                        // Append mobile View More button below grid
                         const mobileViewWrap = document.createElement('div');
                         mobileViewWrap.className = 'mobile-view-more-wrap';
                         mobileViewWrap.innerHTML = `<button class="mobile-view-more-btn interactable sh-view" data-cat="${cat}">View More <i class="ph-bold ph-arrow-right"></i></button>`;
@@ -2428,7 +2529,6 @@
                             </div>
                         `).join('');
                         
-                        // Append mobile View More button below grid
                         const mobileViewWrap = document.createElement('div');
                         mobileViewWrap.className = 'mobile-view-more-wrap';
                         mobileViewWrap.innerHTML = `<button class="mobile-view-more-btn interactable sh-view" data-cat="Videos">All Videos <i class="ph-bold ph-arrow-right"></i></button>`;
@@ -2511,7 +2611,6 @@
                     });
                 }
                 
-                // Bind all View More buttons (desktop inline & mobile appended)
                 document.querySelectorAll('.sh-view').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -2546,7 +2645,6 @@
                         
                         grid.querySelectorAll('.news-card, .video-card').forEach(card => card.classList.add('active'));
 
-                        // Add history state so native back button works
                         history.pushState({ modalOpen: true }, '', '#category');
 
                         catModal.classList.add('active');
@@ -2570,16 +2668,24 @@
             };
 
             /* ==========================================================================
-               5. ORCHESTRATION 
+               5. ORCHESTRATION & PRELOADER LOCK
                ========================================================================== */
             const loadApplicationData = async () => {
                 try {
-                    // Critical Update: Awaiting the promise that was kicked off in the <head>
-                    const [biz, tech, pol, spt, fas, auto, pod, vid, gal, spn] = await window.earlyDataFetchPromise;
+                    // CRITICAL FIX: Lock the loading screen for a strict minimum of 5000ms
+                    const minimumLoadTime = new Promise(resolve => setTimeout(resolve, 5000));
+                    
+                    // Wait for both the new unified GAS request and the 5-second cinematic timer
+                    const [fetchResults] = await Promise.all([
+                        window.earlyDataFetchPromise,
+                        minimumLoadTime
+                    ]);
+
+                    const [biz, tech, pol, spt, fas, auto, pod, vid, gal, spn] = fetchResults || [];
 
                     let allNews = [];
                     const processNews = (res, defaultCategory) => {
-                        if(res.status === 'fulfilled' && Array.isArray(res.value)) {
+                        if(res && res.status === 'fulfilled' && Array.isArray(res.value)) {
                             const processed = res.value.map(item => ({...item, category: item.category || defaultCategory}));
                             allNews = allNews.concat(processed);
                         }
@@ -2593,17 +2699,18 @@
                     processNews(auto, 'Auto');
                     
                     globalState.news = allNews;
-                    if(pod.status === 'fulfilled') globalState.podcasts = pod.value;
-                    if(vid.status === 'fulfilled') globalState.videos = vid.value;
-                    if(gal.status === 'fulfilled') globalState.photos = gal.value;
-                    if(spn.status === 'fulfilled') globalState.sponsors = spn.value;
+                    if(pod && pod.status === 'fulfilled') globalState.podcasts = pod.value;
+                    if(vid && vid.status === 'fulfilled') globalState.videos = vid.value;
+                    if(gal && gal.status === 'fulfilled') globalState.photos = gal.value;
+                    if(spn && spn.status === 'fulfilled') globalState.sponsors = spn.value;
 
+                    // Render UI silently in the background while the preloader is technically still visible (or just fading out)
                     renderUI();
 
                 } catch (error) {
                     console.error("[Release Network] Critical architecture error during data assembly:", error);
                 } finally {
-                    clearTimeout(preloaderTimeout);
+                    // Fade out the 5s preloader
                     hidePreloader();
                 }
             };
@@ -2613,7 +2720,6 @@
                 if (!widget) return;
                 
                 try {
-                    // Get User Location via GeoJS (IP based, no location prompt needed)
                     const geoRes = await fetch('https://get.geojs.io/v1/ip/geo.json');
                     if(!geoRes.ok) throw new Error('Location fetch failed');
                     const geoData = await geoRes.json();
@@ -2623,7 +2729,6 @@
                     const city = geoData.city || 'Unknown';
                     const country = geoData.country_code || '';
 
-                    // Get Local Weather via Open-Meteo (Free API, no key required)
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     if(!weatherRes.ok) throw new Error('Weather fetch failed');
                     const weatherData = await weatherRes.json();
@@ -2631,7 +2736,6 @@
                     const temp = Math.round(weatherData.current_weather.temperature);
                     const code = weatherData.current_weather.weathercode;
                     
-                    // Map WMO Weather Codes to Phosphor Icons
                     let icon = 'ph-sun'; let color = '#FFDF00'; let desc = 'Clear';
                     
                     if (code === 1 || code === 2 || code === 3) { icon = 'ph-cloud'; color = '#A9A9A9'; desc = 'Cloudy'; }
